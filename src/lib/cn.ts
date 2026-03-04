@@ -1,0 +1,4 @@
+// Utility to compose className fragments while dropping falsy values.
+export function cn(...parts: Array<string | false | null | undefined>) {
+    return parts.filter(Boolean).join(' ')
+}
