@@ -111,3 +111,61 @@ export type PlayerGameLog = PlayerGameIdentifiers &
                             PlayerBoxScore &
                             PlayerShotMetrics &
                             GameContext
+
+// bet results - for betting analytics views
+export type BetResult =  PlayerGameIdentifiers &{
+  bet_id: string
+  player_name: string
+  position: string
+  team: string
+  opponent: string
+  is_home: boolean
+  game_outcome: 'W' | 'L' | 'OTL'
+  team_goals: number
+  team_goals_against: number
+  toi: string
+  pim: number
+  actual_sog: number
+  shot_attempts_total: number
+  bet_type: 'under' | 'single' | 'value' | 'parlay'
+  threshold: number 
+  bet_p: number
+  bet_imp: number
+  bet_odds_d: number
+  bet_edge: number
+  hit: number
+  profit: number
+}
+
+export type SuggestedBet = PlayerGameIdentifiers & {
+  bet_id: string
+  player_name: string
+  position: string
+  team: string
+  opponent: string
+  ishome: boolean
+  bet_type: 'under' | 'single' | 'value' | 'parlay'
+  threshold: number // will convert to add or subtract 0.5 for under/over -- eg threshold of 2 and over -> 2.5
+  bet_probability: number
+  bet_implied_odds: number
+  bet_odds: number
+  bet_edge: number
+  shots_per_game: number
+  shot_attempts_per_game: number
+  spg_last5: number
+  sapg_last5: number
+  spg_last10: number
+  sapg_last10: number
+  line_hit_last5: number
+  line_hit_last10: number
+}
+
+export type BetResultSummary<T> = {
+  summary_pivot: T // whatever we group by - bet type, team, player, etc
+  total_bets: number
+  hits: number
+  hit_rate: number
+  average_odds: number
+  profit: number
+}
+                      

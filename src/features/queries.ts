@@ -1,11 +1,18 @@
 import { useQuery } from '@tanstack/react-query'
-import { fetchPredictionsToday, fetchGameLatest, fetchPlayerGamelog } from './api'
+import { fetchBetResults, fetchSuggestedBets, fetchGameLatest, fetchPlayerGamelog } from './api'
 
-// Query hook for today's prediction rows.
-export function usePredictionsToday() {
+// Query hook for the bet results for the last X games (default to 7)
+export function useBetResults(startDate?: string, endDate?: string) {
     return useQuery({
-        queryKey: ['predictions', 'today'],
-        queryFn: fetchPredictionsToday,
+        queryKey: ['bet_id', startDate, endDate],
+        queryFn: () => fetchBetResults(startDate, endDate),
+    })
+}
+// Query hook for today's suggested bet rows.
+export function useSuggestedBets() {
+    return useQuery({
+        queryKey: ['suggested-bets', 'today'],
+        queryFn: fetchSuggestedBets,
     })
 }
 

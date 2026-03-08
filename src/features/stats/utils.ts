@@ -1,4 +1,4 @@
-import type {PlayerGameLog} from '@/features/types'
+import type { PlayerGameLog } from '@/features/types'
 
 export type StatSnapshot = {
     snapshotHorizon: string
