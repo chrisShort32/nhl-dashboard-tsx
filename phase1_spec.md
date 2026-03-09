@@ -12,12 +12,11 @@ Phase 1 builds the core dashboard experience for the NHL analytics app. It gives
 
 ### Top Section: Bet Results Summary
 - Contains 2 pivot tables summarizing betting results
-- The dashboard hits the results API endpoint and stores the last 7 days of data by default
-- If the user selects a custom date range outside of the last 7 days, another API call is fired with the new range
+- The dashboard hits the results API endpoint and stores the last 30 days of data by default
 - Tabs control the date range of data displayed:
     - **Yesterday** (default)
     - **Last Week**
-    - **Custom** — two date pickers (not a tab), user defines both start and end date
+    - **Last Month**
 - Pivot table 1:
     - Rows: bet type (under, single, value, parlay)
     - Columns: number of bets, hit %, profit
@@ -70,7 +69,7 @@ export type BetResult = PlayerGameIdentifiers & {
     bet_implied_odds: number
     bet_odds: number
     bet_edge: number
-    bet_outcome: 'hit' | 'miss'
+    bet_outcome: number
     bet_profit: number
 }
 ```

@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom'
 import { useGamelog } from '@/features/queries'
 import { PlayerSnapshot } from '@/features/player/components/PlayerSnapshot'
 import { PlayerCard } from '@/features/player/components/PlayerCard'
-import { StatTable } from '@/features/stats/components/StatTable'
+import { DataTable } from '@/components/ui/DataTable'
 import { Tabs } from '@/components/ui/Tabs'
 import { useState } from 'react'
 
@@ -78,7 +78,8 @@ export function PlayerPage() {
         
         {displayData && displayData.length > 0 && (
           <div className="mt-6">
-              <StatTable
+              <DataTable
+                  header="Player Stats -- Change this later"
                   data={displayData}
                   columns={[
                       {label: 'Date', key: 'game_date', className: 'font-bold'},
@@ -94,6 +95,8 @@ export function PlayerPage() {
                       {label: 'TOI', key: 'toi'},
                       
                   ]}
+
+                rowKey={(row) => String(row.game_id)}
               />
           </div>
         )}

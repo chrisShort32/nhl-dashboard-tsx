@@ -30,3 +30,35 @@ export function summarizeBetResults<T>(betResults: BetResult[], pivotKey: keyof 
     return summary
 
 }
+
+export function tabDateFilter(betResults: BetResult[], tabValue: string) : BetResult[] {
+    
+    if (tabValue === 'yesterday') {
+        const yesterday = new Date()
+        yesterday.setDate(yesterday.getDate() - 2)
+        const formatted = yesterday.toISOString().split('T')[0]
+        const filtered = betResults.filter((result) => result.game_date === formatted)
+        return filtered
+    }
+    
+    if (tabValue === 'lastWeek') {
+        const startDate = new Date()
+        startDate.setDate(startDate.getDate() - 8)
+        const formatted = startDate.toISOString().split('T')[0]
+        const filtered = betResults.filter((result) => result.game_date >= formatted)
+
+        return filtered
+    }
+
+    if (tabValue === 'lastMonth') {
+        const startDate = new Date()
+
+        startDate.setDate(startDate.getDate() - 30)
+        const formatted = startDate.toISOString().split('T')[0]
+        const filtered = betResults.filter((result) => result.game_date >= formatted)
+
+        return filtered
+    }
+
+    return betResults
+}

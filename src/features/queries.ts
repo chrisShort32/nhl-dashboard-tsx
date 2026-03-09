@@ -4,7 +4,7 @@ import { fetchBetResults, fetchSuggestedBets, fetchGameLatest, fetchPlayerGamelo
 // Query hook for the bet results for the last X games (default to 7)
 export function useBetResults(startDate?: string, endDate?: string) {
     return useQuery({
-        queryKey: ['bet_id', startDate, endDate],
+        queryKey: ['bet-results', startDate, endDate],
         queryFn: () => fetchBetResults(startDate, endDate),
     })
 }

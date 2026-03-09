@@ -114,7 +114,6 @@ export type PlayerGameLog = PlayerGameIdentifiers &
 
 // bet results - for betting analytics views
 export type BetResult =  PlayerGameIdentifiers &{
-  bet_id: string
   player_name: string
   position: string
   team: string
@@ -143,21 +142,25 @@ export type SuggestedBet = PlayerGameIdentifiers & {
   position: string
   team: string
   opponent: string
-  ishome: boolean
+  is_home: boolean
   bet_type: 'under' | 'single' | 'value' | 'parlay'
-  threshold: number // will convert to add or subtract 0.5 for under/over -- eg threshold of 2 and over -> 2.5
-  bet_probability: number
-  bet_implied_odds: number
-  bet_odds: number
+  threshold: number
+  bet_p: number
+  bet_imp: number
+  bet_odds_d: number
   bet_edge: number
-  shots_per_game: number
-  shot_attempts_per_game: number
-  spg_last5: number
-  sapg_last5: number
-  spg_last10: number
-  sapg_last10: number
-  line_hit_last5: number
-  line_hit_last10: number
+  plr_pre_avg_shots: number
+  plr_pre_avg_att: number
+  plr_roll5_shots: number
+  plr_roll5_att: number
+  plr_roll10_shots: number
+  plr_roll10_att: number
+  plr_roll5_over2_shots: number
+  plr_roll5_over3_shots: number
+  plr_roll5_over4_shots: number
+  plr_roll10_over2_shots: number
+  plr_roll10_over3_shots: number
+  plr_roll10_over4_shots: number
 }
 
 export type BetResultSummary<T> = {
