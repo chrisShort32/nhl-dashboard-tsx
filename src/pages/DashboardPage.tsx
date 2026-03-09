@@ -105,6 +105,7 @@ export function DashboardPage() {
                 {label: 'Team', key: 'team'},
                 {label: 'Opp', key: 'opponent'},
                 {label: 'Bet Type', key: 'bet_type'},
+                {label: 'Bet Line', key: 'threshold'},
                 {label: 'Bet Odds', key: 'bet_odds_d',format: (value) => (value).toFixed(2)},
                 {label: 'Implied Prob', key: 'bet_imp', format: (value) => `${(value * 100).toFixed(1)}%`},
                 {label: 'Model Prob', key: 'bet_p', format: (value) => `${(value * 100).toFixed(1)}%`},
