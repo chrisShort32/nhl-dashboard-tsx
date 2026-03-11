@@ -12,6 +12,12 @@ export function AppShell() {
                     <NavLink to="/players" className={navLinkClass}>
                         Players
                     </NavLink>
+                    <NavLink to="/results" className={navLinkClass}>
+                        Bet Results
+                    </NavLink>
+                    <NavLink to="/suggested" className={navLinkClass}>
+                        Suggested Bets
+                    </NavLink>
                 </nav>
             </aside>
         <main className="flex-1 w-auto left-full bg-black-50 overflow-y-auto">

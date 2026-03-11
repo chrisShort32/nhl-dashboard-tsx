@@ -1,34 +1,24 @@
-//import { useGamelog } from '@/features/queries'
-//import { StatTable } from '@/features/stats/components/StatTable'
-//import { useParams } from 'react-router-dom'
-import { PlayerCard } from '@/features/player/components/PlayerCard'
-import { useBetResults, useSuggestedBets } from '@/features/queries'
+import { useBetResults, useSuggestedBets, useMatchups } from '@/features/queries'
 import { summarizeBetResults, tabDateFilter } from '@/features/betting/utils'
 import { Tabs } from '@/components/ui/Tabs'
 import { useState } from 'react'
 import { DataTable } from '@/components/ui/DataTable'
+import { MatchupCard } from '@/components/ui/MatchupCard'
 
 // Landing page that wires shot-related query data to simple dashboard UI.
 export function DashboardPage() {
-  
-  // Test data for PlayerCard
-  const testPlayer = {
-    player_id: '8478402',
-    player_name: 'Connor McDavid',
-    headshot_url: 'https://assets.nhle.com/mugs/nhl/20252026/EDM/8478402.png',
-    position: 'C',
-    sweater_number: 97,
-    team: 'EDM',
-    team_logo: 'https://assets.nhle.com/logos/nhl/svg/EDM_light.svg'
-  }
-
   const { data: betResults, isLoading: isLoadingBetResults, isError: isErrorBetResults } = useBetResults()
   const { data: suggestedBets, isLoading: isLoadingSuggested, isError: isErrorSuggested } = useSuggestedBets()
+  const { data: matchupInfo, isLoading: isLoadingMatchup, isError: isErrorMatchup } = useMatchups()
   const [activeView, setActiveView] = useState('yesterday')
 
   const filtered = betResults ? tabDateFilter(betResults, activeView) : []
   const betSummaryThreshold = summarizeBetResults<number>(filtered, 'threshold')
   const betSummaryBetType = summarizeBetResults<string>(filtered, 'bet_type')
+
+  const today = new Date()
+  today.setDate(today.getDate())
+  const formatted = today.toISOString().split('T')[0]
   
   return (
     <div className="mx-auto max-w-8xl p-6">
@@ -36,10 +26,19 @@ export function DashboardPage() {
       <p className="mt-2 text-sm text-neutral-600">
         Vite + React + TypeScript + Tailwind v4
       </p>
-
-      <div className="mt-6">
-        <PlayerCard {...testPlayer} />
-      </div>
+      {isLoadingMatchup ? (
+        <div>Loading Matchup...</div>
+      ) : isErrorMatchup ? (
+        <div>No Matchups Found</div>
+      ) : matchupInfo ? (
+        <div>
+          <MatchupCard 
+            matchup_info={matchupInfo}
+          />
+        </div>
+      ) : (
+        <div>No Matchups Found</div>
+      )}
       <Tabs
           tabs={[
             {label: 'Yesterday', value: 'yesterday'},
@@ -97,7 +96,7 @@ export function DashboardPage() {
         ) : (suggestedBets && suggestedBets.length > 0 ? (
           <div>
             <DataTable
-              header="Top Bets Today"
+              header={`Top Bets Today (${formatted})`}
               data={suggestedBets.slice(0,10)}
               columns= {[
                 {label: 'Player', key: 'player_name'},

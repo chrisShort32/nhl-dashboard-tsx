@@ -1,33 +1,3 @@
-// Backend response shape for a player's stat line in a completed game.
-export type GameRow = {
-    gameId: string
-    gameDate: string
-    playerId: string
-    playerName: string
-    team: string
-    opponent: string
-    goals: number
-    assists: number
-    sog: number
-    shotAttempts: number
-    toi: string 
-}
-
-// Backend response shape for shot probability predictions.
-export type PredictRow = {
-    gameId: string
-    gameDate: string
-    playerId: string
-    playerName: string
-    team: string
-    opponent: string
-    pGe2: number
-    pGe3: number
-    pGe4: number
-    pGe5: number
-}
-
-
 // Core identifiers - used everywhere, always fetch these
 export type PlayerGameIdentifiers = {
   season: string
@@ -170,5 +140,22 @@ export type BetResultSummary<T> = {
   hit_rate: number
   average_odds: number
   profit: number
+}
+
+export type TeamInfo = {
+  team_abbrev: string
+  team_logo: string
+  team_wins: number
+  team_losses: number
+  team_otl: number
+}
+
+export type MatchupInfo = {
+  game_id: number
+  home: TeamInfo
+  away: TeamInfo
+  venue: string
+  start_time_UTC: string
+
 }
                       

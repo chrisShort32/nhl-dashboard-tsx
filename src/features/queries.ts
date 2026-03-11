@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { fetchBetResults, fetchSuggestedBets, fetchGameLatest, fetchPlayerGamelog } from './api'
+import { fetchBetResults, fetchSuggestedBets, fetchMatchups, fetchPlayerGamelog } from './api'
 
 // Query hook for the bet results for the last X games (default to 7)
 export function useBetResults(startDate?: string, endDate?: string) {
@@ -17,10 +17,10 @@ export function useSuggestedBets() {
 }
 
 // Query hook for the latest game stats rows.
-export function useGameLatest() {
+export function useMatchups() {
     return useQuery({
-        queryKey: ['shots', 'latest'],
-        queryFn: fetchGameLatest,
+        queryKey: ['matchups', 'today'],
+        queryFn: fetchMatchups,
     })
 }
 

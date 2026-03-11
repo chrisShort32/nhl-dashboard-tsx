@@ -1,9 +1,9 @@
 import { api } from '@/lib/api'
-import type { GameRow, PlayerGameLog, SuggestedBet, BetResult } from './types'
+import type { PlayerGameLog, SuggestedBet, BetResult, MatchupInfo } from './types'
 
 // Fetches the latest game row for a single player from the backend.
-export async function fetchGameLatest(): Promise<GameRow[]> {
-    return api.get<GameRow[]>('/last-game?player_id=8471215')
+export async function fetchMatchups(): Promise<MatchupInfo> {
+    return api.get<MatchupInfo>('/today-matchups')
 }
 
 // Fetches the full gamelog for a single player from the backend.

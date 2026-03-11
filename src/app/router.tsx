@@ -25,6 +25,14 @@ export const router = createBrowserRouter([
                 path:'players',
                 element: <div>List of players coming soon?</div>
             },
+            {
+                path:'results',
+                element: <div>Results page coming soon</div>
+            },
+            {
+                path:'suggested',
+                element: <div>Suggested page coming soon</div>
+            }
         ]
     }
 ])
