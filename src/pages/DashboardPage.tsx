@@ -51,6 +51,7 @@ export function DashboardPage() {
       ) : betResults && betResults.length > 0 ? (
         <div>
           <DataTable
+            link="/results"
             header="Bet Results By Threshold"
             data={betSummaryThreshold}
             columns= {[
@@ -66,6 +67,7 @@ export function DashboardPage() {
             rowClassName={(row) => (row.summary_pivot.toString() === 'Total' ? 'font-bold' : '')}
           />
           <DataTable
+            link="/results"
             header="Bet Results By Bet Type"
             data={betSummaryBetType}
             columns= {[
@@ -95,6 +97,7 @@ export function DashboardPage() {
           <div>
             <h1 className='text-3xl font-bold mt-10'>Top Bets Today</h1>
             <DataTable
+              link="/suggested"
               header={matchupInfo[0].start_time_UTC.slice(0,10)}
               data={suggestedBets.slice(0,10)}
               columns= {[

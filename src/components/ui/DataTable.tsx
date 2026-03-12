@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 type Column = {
     label: string
     key: string
@@ -11,12 +12,17 @@ type TableProps<T> = {
     columns: Column[]
     rowKey: (row: T) => string
     rowClassName?: (row: T) => string
+    link?: string
 }
 
-export function DataTable<T>({ header, data, columns, rowKey, rowClassName}: TableProps<T>) {
+export function DataTable<T>({ header, data, columns, rowKey, rowClassName, link}: TableProps<T>) {
     return (
         <div className="mt-4">
-            <h2 className="text-lg font-bold">{header}</h2>
+            {link ? (
+                <Link to={link}><h2 className="text-lg font-bold mb-2 hover:underline">{header}</h2></Link>
+            ) : (
+                <h2 className="text-lg font-bold mb-2">{header}</h2>
+            )}
             <table className="w-full border-collapse">
                 <thead className="bg-black-100">
                     <tr>
