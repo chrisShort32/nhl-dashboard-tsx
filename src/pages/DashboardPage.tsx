@@ -17,7 +17,7 @@ export function DashboardPage() {
   const betSummaryBetType = summarizeBetResults<string>(filtered, 'bet_type', { includeTotals: true })
   return (
     <div className="mx-auto max-w-8xl p-6">
-      <h1 className="text-2xl font-bold text-center">NHL Dashboard</h1>
+      <h1 className="text-5xl font-bold text-center">NHL Dashboard</h1>
       {isLoadingMatchup ? (
         <div>Loading Matchup...</div>
       ) : isErrorMatchup ? (
@@ -31,9 +31,9 @@ export function DashboardPage() {
       ) : (
         <div>No Matchups Found</div>
       )}
-      <div className='rounded-lg border border-red-500 mt-4 p-4'>
       <div>
-        <h1 className='font-bold'>Results Summaries</h1>
+      <div>
+        <h1 className='text-3xl font-bold mt-10'>Results Summaries</h1>
         <Tabs
             tabs={[
               {label: 'Yesterday', value: 'yesterday'},
@@ -92,8 +92,8 @@ export function DashboardPage() {
         ) : isErrorSuggested ? (
           <div>Error Loading Suggested Bets</div>
         ) : (suggestedBets && suggestedBets.length > 0  && matchupInfo ? (
-          <div className='rounded-lg border border-red-500 mt-6 p-4'>
-            <h1 className='font-bold'>Top Bets Today</h1>
+          <div>
+            <h1 className='text-3xl font-bold mt-10'>Top Bets Today</h1>
             <DataTable
               header={matchupInfo[0].start_time_UTC.slice(0,10)}
               data={suggestedBets.slice(0,10)}

@@ -15,7 +15,7 @@ type TableProps<T> = {
 
 export function DataTable<T>({ header, data, columns, rowKey, rowClassName}: TableProps<T>) {
     return (
-        <div className="mt-6">
+        <div className="mt-4">
             <h2 className="text-lg font-bold">{header}</h2>
             <table className="w-full border-collapse">
                 <thead className="bg-black-100">
