@@ -12,6 +12,9 @@ export function AppShell() {
                     <NavLink to="/players" className={navLinkClass}>
                         Players
                     </NavLink>
+                    <NavLink to="/teams" className={navLinkClass}>
+                        Teams
+                    </NavLink>
                     <NavLink to="/results" className={navLinkClass}>
                         Bet Results
                     </NavLink>
