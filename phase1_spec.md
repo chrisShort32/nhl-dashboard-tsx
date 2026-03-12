@@ -1,108 +1,141 @@
 # Phase 1 Specs
 
 ## Summary
-Phase 1 builds the core dashboard experience for the NHL analytics app. It gives the user a daily command center that surfaces recent bet results (with summary analytics) and today's model-suggested bets, replacing the current workflow of manually filtering CSVs in Numbers/Excel. The dashboard home page provides at-a-glance summaries, with dedicated detail pages for deeper exploration of results and suggestions.
+Phase 1 is the core dashboard + betting snapshot experience, backed by live API queries. The dashboard now renders matchup context, bet-results summaries, and a top-10 suggested-bets table. Player detail is also live via `/player/:playerId`, while results/suggested detail pages are still placeholders.
 
-## Routes
-- `/dashboard` — the 'home' page where the at-a-glance summaries live **(Phase 1a)**
-- `/results` — in-depth and more customizable betting and prediction results **(Phase 1b)**
-- `/suggestions` — in-depth and more customizable suggested bets for today's games **(Phase 1c)**
+## Routes (Current)
+- `/` — redirects to `/dashboard`
+- `/dashboard` — home page with matchup card, bet-results summaries, and suggested bets table
+- `/player/:playerId` — player game-log detail page with aggregates + per-game table
+- `/players` — placeholder
+- `/results` — placeholder
+- `/suggested` — placeholder (note: route is `/suggested`, not `/suggestions`)
 
-## Dashboard Page Layout
+## Dashboard Page Layout (Implemented)
 
-### Top Section: Bet Results Summary
-- Contains 2 pivot tables summarizing betting results
-- The dashboard hits the results API endpoint and stores the last 30 days of data by default
-- Tabs control the date range of data displayed:
-    - **Yesterday** (default)
-    - **Last Week**
-    - **Last Month**
-- Pivot table 1:
-    - Rows: bet type (under, single, value, parlay)
-    - Columns: number of bets, hit %, profit
-- Pivot table 2:
-    - Rows: threshold / betting line (2, 3, 4, 5)
-    - Columns: number of bets, hit %, profit
-- Link/button at the bottom navigating to `/results` detail page
+### Matchup Context
+- Single matchup card from `GET /today-matchups`
+- Shows home/away, venue, start time, record summary (from `MatchupInfo`)
 
-### Bottom Section: Today's Suggested Bets Snapshot
-- Table showing the top 10 suggested bets by highest bet edge
-- If no games are scheduled today, display "No games scheduled" message
-- Table header: "Today's Suggested Bets — <date>"
-- Table columns: player name, team, opponent, threshold, bet odds, bet probability, bet implied probability, bet edge, shots per game, shots per game last 5, line hit last 5
-- Link/button at the bottom navigating to `/suggestions` detail page
+### Bet Results Summary
+- Two pivot tables rendered via `DataTable`
+- Tabs control date filter applied client-side:
+  - **Yesterday** (default)
+  - **Last Week**
+  - **Last Month**
+- Table 1: Bet results by threshold
+- Table 2: Bet results by bet type
+- Columns: total bets, hits, hit rate, average odds, profit
 
-## API Contracts
+### Suggested Bets Snapshot
+- Table shows top 10 rows returned by `GET /suggested-bets`
+- Header uses `Top Bets Today (YYYY-MM-DD)`
+- If no rows, shows "No Suggested Bets Found"
+- Columns include:
+  - player, position, team, opponent
+  - bet type, threshold, odds, implied/model probability, edge
+  - pre-game averages and rolling shot/attempt stats (L5/L10)
+  - over-2/3/4 shot counts for L5/L10
+
+## API Contracts (Current)
 
 ### Shared Types
 ```typescript
-// Core identifiers — used across all feature types
+// Core identifiers - used everywhere, always fetch these
 export type PlayerGameIdentifiers = {
-    season: string
-    game_id: string
-    game_date: string
-    player_id: string
-    team_id: string
+  season: string
+  game_id: string
+  game_date: string
+  player_id: string
+  team_id: string
+}
+```
+
+### Matchups
+- **Endpoint:** `GET /today-matchups` → `MatchupInfo`
+```typescript
+export type TeamInfo = {
+  team_abbrev: string
+  team_logo: string
+  team_wins: number
+  team_losses: number
+  team_otl: number
+}
+
+export type MatchupInfo = {
+  game_id: number
+  home: TeamInfo
+  away: TeamInfo
+  venue: string
+  start_time_UTC: string
 }
 ```
 
 ### Bet Results
 - **Endpoint:** `GET /bet-results?start_date=...&end_date=...` → `BetResult[]`
-
 ```typescript
 export type BetResult = PlayerGameIdentifiers & {
-    player_name: string
-    position: string
-    team: string
-    opponent: string
-    ishome: boolean
-    game_outcome: 'W' | 'L' | 'OTL'
-    team_score: number
-    opponent_score: number
-    toi: number               // seconds
-    pim: number
-    actual_sog: number
-    shot_attempts: number
-    bet_type: 'under' | 'single' | 'value' | 'parlay'
-    threshold: number          // +/- 0.5 for over/under
-    bet_probability: number
-    bet_implied_odds: number
-    bet_odds: number
-    bet_edge: number
-    bet_outcome: number
-    bet_profit: number
+  player_name: string
+  position: string
+  team: string
+  opponent: string
+  is_home: boolean
+  game_outcome: 'W' | 'L' | 'OTL'
+  team_goals: number
+  team_goals_against: number
+  toi: string
+  pim: number
+  actual_sog: number
+  shot_attempts_total: number
+  bet_type: 'under' | 'single' | 'value' | 'parlay'
+  threshold: number
+  bet_p: number
+  bet_imp: number
+  bet_odds_d: number
+  bet_edge: number
+  hit: number
+  profit: number
 }
 ```
 
-### Suggestions
+### Suggested Bets
 - **Endpoint:** `GET /suggested-bets` → `SuggestedBet[]` (empty array if no games)
-
 ```typescript
 export type SuggestedBet = PlayerGameIdentifiers & {
-    player_name: string
-    position: string
-    team: string
-    opponent: string
-    ishome: boolean
-    bet_type: 'under' | 'single' | 'value' | 'parlay'
-    threshold: number          // +/- 0.5 for over/under
-    bet_probability: number
-    bet_implied_odds: number
-    bet_odds: number
-    bet_edge: number
-    shots_per_game: number
-    shot_attempts_per_game: number
-    spg_last5: number
-    sapg_last5: number
-    spg_last10: number
-    sapg_last10: number
-    line_hit_last5: number
-    line_hit_last10: number
+  bet_id: string
+  player_name: string
+  position: string
+  team: string
+  opponent: string
+  is_home: boolean
+  bet_type: 'under' | 'single' | 'value' | 'parlay'
+  threshold: number
+  bet_p: number
+  bet_imp: number
+  bet_odds_d: number
+  bet_edge: number
+  plr_pre_avg_shots: number
+  plr_pre_avg_att: number
+  plr_roll5_shots: number
+  plr_roll5_att: number
+  plr_roll10_shots: number
+  plr_roll10_att: number
+  plr_roll5_over2_shots: number
+  plr_roll5_over3_shots: number
+  plr_roll5_over4_shots: number
+  plr_roll10_over2_shots: number
+  plr_roll10_over3_shots: number
+  plr_roll10_over4_shots: number
 }
 ```
 
-## Deferred
-- `/players` — player list and player detail pages (Phase 2)
-- Team routes and team detail pages
+### Player Game Log
+- **Endpoint:** `GET /player-gamelog?player_id=...` → `PlayerGameLog[]`
+- Used by `/player/:playerId` for per-game rows + aggregate snapshot
+
+## Deferred / Not Yet Implemented
+- `/players` list UI (currently placeholder)
+- `/results` and `/suggested` detail pages (currently placeholder)
+- Team routes and team detail pages (components exist but are not wired)
 - Historical suggested bets with rolling stats recalculation
 - Custom deep-dive analysis endpoints

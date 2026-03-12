@@ -3,7 +3,7 @@ import { summarizeBetResults, tabDateFilter } from '@/features/betting/utils'
 import { Tabs } from '@/components/ui/Tabs'
 import { useState } from 'react'
 import { DataTable } from '@/components/ui/DataTable'
-import { MatchupCard } from '@/components/ui/MatchupCard'
+import { SlateCard } from '@/components/ui/SlateCard'
 
 // Landing page that wires shot-related query data to simple dashboard UI.
 export function DashboardPage() {
@@ -11,44 +11,39 @@ export function DashboardPage() {
   const { data: suggestedBets, isLoading: isLoadingSuggested, isError: isErrorSuggested } = useSuggestedBets()
   const { data: matchupInfo, isLoading: isLoadingMatchup, isError: isErrorMatchup } = useMatchups()
   const [activeView, setActiveView] = useState('yesterday')
-
-  const filtered = betResults ? tabDateFilter(betResults, activeView) : []
-  const betSummaryThreshold = summarizeBetResults<number>(filtered, 'threshold')
-  const betSummaryBetType = summarizeBetResults<string>(filtered, 'bet_type')
-
-  const today = new Date()
-  today.setDate(today.getDate())
-  const formatted = today.toISOString().split('T')[0]
   
+  const filtered = betResults ? tabDateFilter(betResults, activeView) : []
+  const betSummaryThreshold = summarizeBetResults<number>(filtered, 'threshold', { includeTotals: true })
+  const betSummaryBetType = summarizeBetResults<string>(filtered, 'bet_type', { includeTotals: true })
   return (
     <div className="mx-auto max-w-8xl p-6">
-      <h1 className="text-2xl font-semibold ">NHL Dashboard</h1>
-      <p className="mt-2 text-sm text-neutral-600">
-        Vite + React + TypeScript + Tailwind v4
-      </p>
+      <h1 className="text-2xl font-bold text-center">NHL Dashboard</h1>
       {isLoadingMatchup ? (
         <div>Loading Matchup...</div>
       ) : isErrorMatchup ? (
         <div>No Matchups Found</div>
       ) : matchupInfo ? (
         <div>
-          <MatchupCard 
-            matchup_info={matchupInfo}
+          <SlateCard
+            slate={matchupInfo}
           />
         </div>
       ) : (
         <div>No Matchups Found</div>
       )}
-      <Tabs
-          tabs={[
-            {label: 'Yesterday', value: 'yesterday'},
-            {label: 'Last Week', value: 'lastWeek'},
-            {label: 'Last Month', value: 'lastMonth'}
-          ]}
-          activeTab={activeView}
-          onChange={setActiveView}
-        />
-  
+      <div className='rounded-lg border border-red-500 mt-4 p-4'>
+      <div>
+        <h1 className='font-bold'>Results Summaries</h1>
+        <Tabs
+            tabs={[
+              {label: 'Yesterday', value: 'yesterday'},
+              {label: 'Last Week', value: 'lastWeek'},
+              {label: 'Last Month', value: 'lastMonth'}
+            ]}
+            activeTab={activeView}
+            onChange={setActiveView}
+          />
+      </div>
       {isLoadingBetResults ? (
         <div>Loading Bet Results...</div>
       ) : isErrorBetResults ? (
@@ -68,6 +63,7 @@ export function DashboardPage() {
 
             ]}
             rowKey={(row) => String(row.summary_pivot)}
+            rowClassName={(row) => (row.summary_pivot.toString() === 'Total' ? 'font-bold' : '')}
           />
           <DataTable
             header="Bet Results By Bet Type"
@@ -82,6 +78,7 @@ export function DashboardPage() {
 
             ]}
             rowKey={(row) => String(row.summary_pivot)}
+            rowClassName={(row) => (row.summary_pivot === 'Total' ? 'font-bold' : '')}
           />
 
         </div>
@@ -89,14 +86,16 @@ export function DashboardPage() {
       ) : (
         <div>No Bet Results Found</div>
       )}
+      </div>
         {isLoadingSuggested ? (
           <div>Loading Suggested Bets...</div>
         ) : isErrorSuggested ? (
           <div>Error Loading Suggested Bets</div>
-        ) : (suggestedBets && suggestedBets.length > 0 ? (
-          <div>
+        ) : (suggestedBets && suggestedBets.length > 0  && matchupInfo ? (
+          <div className='rounded-lg border border-red-500 mt-6 p-4'>
+            <h1 className='font-bold'>Top Bets Today</h1>
             <DataTable
-              header={`Top Bets Today (${formatted})`}
+              header={matchupInfo[0].start_time_UTC.slice(0,10)}
               data={suggestedBets.slice(0,10)}
               columns= {[
                 {label: 'Player', key: 'player_name'},

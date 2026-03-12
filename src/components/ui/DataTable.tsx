@@ -10,9 +10,10 @@ type TableProps<T> = {
     data: T[]
     columns: Column[]
     rowKey: (row: T) => string
+    rowClassName?: (row: T) => string
 }
 
-export function DataTable<T>({ header, data, columns, rowKey}: TableProps<T>) {
+export function DataTable<T>({ header, data, columns, rowKey, rowClassName}: TableProps<T>) {
     return (
         <div className="mt-6">
             <h2 className="text-lg font-bold">{header}</h2>
@@ -31,7 +32,10 @@ export function DataTable<T>({ header, data, columns, rowKey}: TableProps<T>) {
                 </thead>
                 <tbody>
                     {data.map((row) => (
-                        <tr key={rowKey(row)} className="hover:bg-indigo-600">
+                        <tr
+                            key={rowKey(row)}
+                            className={`hover:bg-indigo-600 ${rowClassName ? rowClassName(row) : ''}`}
+                        >
                             {columns.map((column) => (
                                 <td 
                                     key={column.key}

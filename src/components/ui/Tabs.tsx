@@ -13,7 +13,7 @@ export function Tabs({ tabs, activeTab, onChange }: TabsProps) {
     const activeStyles = 'bg-blue-600 text-white px-4 py-2 rounded-lg'
     const inactiveStyles = 'bg-gray-700 text-gray-300 px-4 py-2 rounded-lg'
     return (
-        <div className="flex space-x-6 h-25 p-6">
+        <div className="flex space-x-6 h-25 p-7 mt-4">
             {tabs.map((tab) => (
                 <button
                     key={tab.value}
