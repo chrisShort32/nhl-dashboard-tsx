@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import type { FilterState } from '@/features/types'
 import { useBetResults } from '@/features/queries'
-import { applyFilters, computeCumulativeProfit } from '@/features/betting/utils'
+import { DataTable } from '@/components/ui/DataTable' 
+import { applyFilters, computeCumulativeProfit, summarizeBetResults } from '@/features/betting/utils'
 import { ResponsiveContainer, CartesianGrid, Line, LineChart, XAxis, YAxis, Tooltip, ReferenceLine } from 'recharts'
 
 const DATE_RANGE_OPTIONS = [
     { label: 'Yesterday', value: 0 },
-    { label: 'Last 7', value: 7 },
-    { label: 'Last 30', value: 30 },
+    { label: 'Last 7', value: 6 },
+    { label: 'Last 30', value: 30},
     { label: 'Last 90', value: 90 },
     { label: 'All', value: 'all' }
 ]
@@ -35,11 +36,15 @@ export function ResultsPage(){
     const todayString = today.toISOString().split('T')[0]
     const {data: betResults, isLoading, isError} = useBetResults('01-01-2026', todayString)
     const filtered = betResults ? applyFilters(betResults, filter) : []
+
     const chartData = computeCumulativeProfit(filtered)
+    const betSummaryThreshold = summarizeBetResults<number>(filtered, 'threshold', { includeTotals: true })
+    const betSummaryBetType = summarizeBetResults<string>(filtered, 'bet_type', { includeTotals: true })
+    
     
     
     return (
-        <div>
+        <div className="mx-auto max-w-8xl p-6">
             <div className='grid grid-cols-3 mt-5 p-10 w-125 items-center'>
                 <div className='w-25'>
                     <label>Time Period
@@ -130,6 +135,39 @@ export function ResultsPage(){
                             <ReferenceLine y={0} stroke="gold" label={{fill: 'white', value: "Break Even"}}/>
                         </LineChart>
                     </ResponsiveContainer>
+                    <DataTable
+                    link="/results"
+                    header="Bet Results By Threshold"
+                    data={betSummaryThreshold}
+                    columns= {[
+                        {label: 'Threshold', key: 'summary_pivot'},
+                        {label: 'Total Bets', key: 'total_bets'},
+                        {label: 'Hits', key: 'hits'},
+                        {label: 'Hit Rate', key: 'hit_rate', format: (value) => `${(value * 100).toFixed(1)}%`},
+                        {label: 'Avg Odds', key: 'average_odds', format: (value) => (value).toFixed(2)},
+                        {label: 'Profit', key: 'profit', format: (value) => `$${(value).toFixed(2)}`},
+        
+                    ]}
+                    rowKey={(row) => String(row.summary_pivot)}
+                    rowClassName={(row) => (row.summary_pivot.toString() === 'Total' ? 'font-bold' : '')}
+                    />
+                    <DataTable
+                    link="/results"
+                    header="Bet Results By Bet Type"
+                    data={betSummaryBetType}
+                    columns= {[
+                        {label: 'Bet Type', key: 'summary_pivot'},
+                        {label: 'Total Bets', key: 'total_bets'},
+                        {label: 'Hits', key: 'hits'},
+                        {label: 'Hit Rate', key: 'hit_rate', format: (value) => `${(value * 100).toFixed(1)}%`},
+                        {label: 'Avg Odds', key: 'average_odds', format: (value) => (value).toFixed(2)},
+                        {label: 'Profit', key: 'profit', format: (value) => `$${(value).toFixed(2)}`},
+        
+                    ]}
+                    rowKey={(row) => String(row.summary_pivot)}
+                    rowClassName={(row) => (row.summary_pivot === 'Total' ? 'font-bold' : '')}
+                    />
+                
                 </div>
             ) : (
                 <div>No Data Found</div>

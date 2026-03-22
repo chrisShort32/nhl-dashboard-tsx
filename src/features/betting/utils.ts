@@ -79,43 +79,25 @@ export function applyFilters(betResults: BetResult[], filterState: FilterState) 
 }
 
 export function computeCumulativeProfit(betResults: BetResult[]) : { game_date: string, cum_profit: number }[] {
-    const dailyTotalMap = new Map<string, number>()
+    
     if (betResults.length === 0) return []
-
-    let max = betResults.reduce((max, r) => r.game_date > max ? r.game_date : max, '')
-    let min = max
+    
+    const dailyTotalMap = new Map<string, number>()
+    
     betResults.forEach((results) => {
-        if (!dailyTotalMap.has(results.game_date)) {
-            dailyTotalMap.set(results.game_date, results.profit)
+        const current = dailyTotalMap.get(results.game_date) ?? 0
+        dailyTotalMap.set(results.game_date, current + results.profit)
+    })
 
-            
-        } else {
-            const currentTotal = dailyTotalMap.get(results.game_date)
-            const cumTotal = currentTotal ? currentTotal + results.profit : results.profit
-            dailyTotalMap.set(results.game_date, cumTotal)
-        }
-
-        const checkDate = new Date(results.game_date)
-            if (max < checkDate.toISOString().split('T')[0]) {
-                max = checkDate.toISOString().split('T')[0]
-            }
-            if (min > checkDate.toISOString().split('T')[0]) {
-                min = checkDate.toISOString().split('T')[0]
-            }
-    });
-
-    const dateProfit: { game_date: string, cum_profit: number }[] = []
+    const sortedDates = Array.from(dailyTotalMap.keys()).sort()
     let cum_profit = 0
 
-    for (let d = new Date(min); d.toISOString().split('T')[0] <= max; d.setDate(d.getDate() + 1)) {
-        const dateString = d.toISOString().split('T')[0]
-        if (dailyTotalMap.has(dateString)) {
-            const dayTotal = dailyTotalMap.get(dateString) ?? 0
-            cum_profit += dayTotal
-            cum_profit = Number(cum_profit.toFixed(2))
-            dateProfit.push({game_date: dateString, cum_profit})
-        }
-    }
+    const dateProfit = sortedDates.map((date) => {
+        cum_profit += dailyTotalMap.get(date) ?? 0
+        const formatted = Number(cum_profit.toFixed(2))
+        return { game_date: date, cum_profit: formatted }
+    })
+    
     return dateProfit
 }
 
