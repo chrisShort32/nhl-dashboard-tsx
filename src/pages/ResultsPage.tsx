@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { FilterState } from '@/features/types'
 import { useBetResults } from '@/features/queries'
 import { applyFilters, computeCumulativeProfit } from '@/features/betting/utils'
-import { ResponsiveContainer, CartesianGrid, Line, LineChart, XAxis, YAxis, Tooltip } from 'recharts'
+import { ResponsiveContainer, CartesianGrid, Line, LineChart, XAxis, YAxis, Tooltip, ReferenceLine } from 'recharts'
 
 const DATE_RANGE_OPTIONS = [
     { label: 'Yesterday', value: 0 },
@@ -36,6 +36,7 @@ export function ResultsPage(){
     const {data: betResults, isLoading, isError} = useBetResults('01-01-2026', todayString)
     const filtered = betResults ? applyFilters(betResults, filter) : []
     const chartData = computeCumulativeProfit(filtered)
+    
     
     return (
         <div>
@@ -93,16 +94,43 @@ export function ResultsPage(){
             ) : isError ? (
                 <div>Error fetching Chart Data</div>
             ) : chartData ? (
-                <ResponsiveContainer width="100%" height={400}>
-                    <LineChart data={chartData}>
-                        <CartesianGrid strokeDasharray="5 5" />
-                        <XAxis dataKey="game_date" />
-                        <YAxis />
-                        <Tooltip />
-                        <Line type="monotone" dataKey="cum_profit" stroke="#6366f1" dot={true} />
-                    </LineChart>
-                </ResponsiveContainer>
+                <div className='ml-5'>
+                    <h1 className='text-3xl font-bold p-5 m-5'>Profit Over Time</h1>
+                    <ResponsiveContainer width="90%" height={500}>
+                        <LineChart data={chartData} title={"Profit Over Time"}>
+                            <CartesianGrid strokeDasharray="5 5" />
+                            <XAxis 
+                                dataKey="game_date" 
+                                tick={{ fontSize: 12, fill: '#ffffff' }}
+                                label={{ value: 'Date', position: 'insideBottom', offset: -5, fill: '#ffffff' }}
+                                height={60}
+                                stroke='#ffffff'
+                            />
+                            <YAxis
+                                domain={[
+                                    (dataMin: number) => Math.min(-5, dataMin - 1),
+                                    (dataMax: number) => Math.max(5, dataMax + 1)
+                                ]} 
+                                tickFormatter={(value) => `$${value.toFixed(0)}`}
+                                tick={{ fontSize: 12, fill: '#ffffff' }}
+                                label={{ value: 'Profit ($)', angle: -90, position: 'insideLeft', fill: '#ffffff' }}
+                                stroke='#ffffff'
+                            />
+                            <Tooltip formatter={(value) => [value, "Cumulative Profit ($)"]} />
 
+                            <Line 
+                                type="monotone" 
+                                dataKey="cum_profit" 
+                                stroke="#6366f1" 
+                                dot={(props) => {
+                                    const { cx, cy, payload } = props
+                                    const color = payload.cum_profit >= 0 ? '#0ffa26' : '#ef4444'
+                                    return <circle cx={cx} cy={cy} r={6} strokeWidth={2} fill={color} />
+                                }} />
+                            <ReferenceLine y={0} stroke="gold" label={{fill: 'white', value: "Break Even"}}/>
+                        </LineChart>
+                    </ResponsiveContainer>
+                </div>
             ) : (
                 <div>No Data Found</div>
             )}

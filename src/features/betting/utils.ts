@@ -69,14 +69,12 @@ export function applyFilters(betResults: BetResult[], filterState: FilterState) 
     if (dateFilter !== 'all') {
         dateRange.setDate(dateRange.getDate() - dateFilter)
     }
-    
     const thresholdFilter = filterState.thresholdFilter
     const typeFilter = filterState.typeFilter
     const filtered = betResults.filter((result) => 
-        (dateFilter !== 'all' ? result.game_date > (dateRange.toISOString().split('T')[0]) : true) &&
+        (dateFilter !== 'all' ? result.game_date >= (dateRange.toISOString().split('T')[0]) : true) &&
         (thresholdFilter !== 'all' ? result.threshold === (thresholdFilter) : true) &&
         ((typeFilter === 'all' ? true : typeFilter === 'over' ? result.bet_type !== 'under' : result.bet_type === typeFilter)))
-
     return filtered
 }
 
@@ -86,8 +84,6 @@ export function computeCumulativeProfit(betResults: BetResult[]) : { game_date: 
 
     let max = betResults.reduce((max, r) => r.game_date > max ? r.game_date : max, '')
     let min = max
-    const maxDate = new Date(max)
-    const minDate = new Date(max)
     betResults.forEach((results) => {
         if (!dailyTotalMap.has(results.game_date)) {
             dailyTotalMap.set(results.game_date, results.profit)
@@ -116,6 +112,7 @@ export function computeCumulativeProfit(betResults: BetResult[]) : { game_date: 
         if (dailyTotalMap.has(dateString)) {
             const dayTotal = dailyTotalMap.get(dateString) ?? 0
             cum_profit += dayTotal
+            cum_profit = Number(cum_profit.toFixed(2))
             dateProfit.push({game_date: dateString, cum_profit})
         }
     }
