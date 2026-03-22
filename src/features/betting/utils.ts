@@ -1,4 +1,4 @@
-import type { BetResultSummary, BetResult } from "../types";
+import type { BetResultSummary, BetResult, FilterState } from "../types";
 
 export function summarizeBetResults<T>(
     betResults: BetResult[],
@@ -57,6 +57,69 @@ export function summarizeBetResults<T>(
 
     return summary
 
+}
+
+export function applyFilters(betResults: BetResult[], filterState: FilterState) : BetResult[] {
+    if (betResults.length === 0) return []
+    
+    // date filter
+    const maxDate = betResults.reduce((max, r) => r.game_date > max ? r.game_date : max, '')
+    const dateRange = new Date(maxDate)
+    const dateFilter = filterState.dateRange
+    if (dateFilter !== 'all') {
+        dateRange.setDate(dateRange.getDate() - dateFilter)
+    }
+    
+    const thresholdFilter = filterState.thresholdFilter
+    const typeFilter = filterState.typeFilter
+    const filtered = betResults.filter((result) => 
+        (dateFilter !== 'all' ? result.game_date > (dateRange.toISOString().split('T')[0]) : true) &&
+        (thresholdFilter !== 'all' ? result.threshold === (thresholdFilter) : true) &&
+        ((typeFilter === 'all' ? true : typeFilter === 'over' ? result.bet_type !== 'under' : result.bet_type === typeFilter)))
+
+    return filtered
+}
+
+export function computeCumulativeProfit(betResults: BetResult[]) : { game_date: string, cum_profit: number }[] {
+    const dailyTotalMap = new Map<string, number>()
+    if (betResults.length === 0) return []
+
+    let max = betResults.reduce((max, r) => r.game_date > max ? r.game_date : max, '')
+    let min = max
+    const maxDate = new Date(max)
+    const minDate = new Date(max)
+    betResults.forEach((results) => {
+        if (!dailyTotalMap.has(results.game_date)) {
+            dailyTotalMap.set(results.game_date, results.profit)
+
+            
+        } else {
+            const currentTotal = dailyTotalMap.get(results.game_date)
+            const cumTotal = currentTotal ? currentTotal + results.profit : results.profit
+            dailyTotalMap.set(results.game_date, cumTotal)
+        }
+
+        const checkDate = new Date(results.game_date)
+            if (max < checkDate.toISOString().split('T')[0]) {
+                max = checkDate.toISOString().split('T')[0]
+            }
+            if (min > checkDate.toISOString().split('T')[0]) {
+                min = checkDate.toISOString().split('T')[0]
+            }
+    });
+
+    const dateProfit: { game_date: string, cum_profit: number }[] = []
+    let cum_profit = 0
+
+    for (let d = new Date(min); d.toISOString().split('T')[0] <= max; d.setDate(d.getDate() + 1)) {
+        const dateString = d.toISOString().split('T')[0]
+        if (dailyTotalMap.has(dateString)) {
+            const dayTotal = dailyTotalMap.get(dateString) ?? 0
+            cum_profit += dayTotal
+            dateProfit.push({game_date: dateString, cum_profit})
+        }
+    }
+    return dateProfit
 }
 
 export function tabDateFilter(betResults: BetResult[], tabValue: string) : BetResult[] {

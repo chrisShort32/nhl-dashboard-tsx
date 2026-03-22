@@ -158,4 +158,10 @@ export type MatchupInfo = {
   start_time_UTC: string
 
 }
+
+export type FilterState = {
+  dateRange: 0 | 7 | 30 | 90 | 'all'
+  typeFilter: 'over' | 'single' | 'value' | 'parlay' | 'under' | 'all'
+  thresholdFilter: 2 | 3 | 4 | 5 | 'all'
+}
                       
