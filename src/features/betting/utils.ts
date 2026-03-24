@@ -1,16 +1,21 @@
 import type { BetResultSummary, BetResult, FilterState } from "../types";
 
-export function summarizeBetResults<T>(
+export function summarizeBetResults<T, K extends keyof BetResult = never>(
     betResults: BetResult[],
-    pivotKey: keyof BetResult,
+    pivotKey: keyof BetResult | ((result: BetResult) => string),
     options?: {
         includeTotals?: boolean
         totalsLabel?: T
+        additionalFields?: K[]
     }
-): BetResultSummary<T>[] {
+): (BetResultSummary<T> & Partial<Pick<BetResult, K>>)[] {
     const groups = new Map<T, BetResult[]>()
+    const getKey = typeof pivotKey === 'function'
+            ? pivotKey
+            : (result: BetResult) => result[pivotKey]
+
     betResults.forEach((result) => {
-        const pivotValue = result[pivotKey] as T
+        const pivotValue = getKey(result) as T
 
         if (!groups.has(pivotValue)) {
             groups.set(pivotValue,[result])
@@ -20,7 +25,7 @@ export function summarizeBetResults<T>(
         }
     })
 
-    const summary: BetResultSummary<T>[] = []
+    const summary: (BetResultSummary<T> & Partial<Pick<BetResult, K>>)[] = []
     groups.forEach((value, key) => {
         const total_bets = value.length
         const hits = value.reduce((sum, result) => sum + (result.hit ? 1 : 0), 0)
@@ -30,7 +35,11 @@ export function summarizeBetResults<T>(
         const profit = value.reduce((sum, result) => sum + result.profit, 0)
         const summary_pivot = key
         const groupSummary: BetResultSummary<T> = {summary_pivot, total_bets, hits, hit_rate, average_odds, profit}
-        summary.push(groupSummary)
+        const extra = {} as Pick<BetResult, K>
+        options?.additionalFields?.forEach((field) => {
+            extra[field] = value[0][field]
+        }) 
+        summary.push({ ...groupSummary, ...extra })
 
     })
 
@@ -52,7 +61,7 @@ export function summarizeBetResults<T>(
         const average_odds = total_bets > 0 ? odds_total / total_bets : 0
         const profit = betResults.reduce((sum, result) => sum + result.profit, 0)
         const summary_pivot = (options.totalsLabel ?? ('Total' as T))
-        summary.push({ summary_pivot, total_bets, hits, hit_rate, average_odds, profit })
+        summary.push({ summary_pivot, total_bets, hits, hit_rate, average_odds, profit } as BetResultSummary<T> & Partial<Pick<BetResult, K>>)
     }
 
     return summary

@@ -3,7 +3,7 @@ import type { FilterState } from '@/features/types'
 import { useBetResults } from '@/features/queries'
 import { DataTable } from '@/components/ui/DataTable' 
 import { applyFilters, computeCumulativeProfit, summarizeBetResults } from '@/features/betting/utils'
-import { ResponsiveContainer, CartesianGrid, Line, LineChart, XAxis, YAxis, Tooltip, ReferenceLine } from 'recharts'
+import { ResponsiveContainer, CartesianGrid, Line, LineChart, BarChart, Bar, Legend, XAxis, YAxis, Tooltip, ReferenceLine } from 'recharts'
 
 const DATE_RANGE_OPTIONS = [
     { label: 'Yesterday', value: 0 },
@@ -30,8 +30,9 @@ const THRESHOLD_OPTIONS = [
     { label: 'All', value: 'all' }
 ]
 
-export function ResultsPage(){
-    const [filter, setFilter] = useState<FilterState>({dateRange: 0, typeFilter: 'all', thresholdFilter: 'all'})
+
+export function ResultsPage() {
+    const [filter, setFilter] = useState<FilterState>({dateRange: 'all', typeFilter: 'all', thresholdFilter: 'all'})
     const today = new Date()
     const todayString = today.toISOString().split('T')[0]
     const {data: betResults, isLoading, isError} = useBetResults('01-01-2026', todayString)
@@ -40,9 +41,20 @@ export function ResultsPage(){
     const chartData = computeCumulativeProfit(filtered)
     const betSummaryThreshold = summarizeBetResults<number>(filtered, 'threshold', { includeTotals: true })
     const betSummaryBetType = summarizeBetResults<string>(filtered, 'bet_type', { includeTotals: true })
-    
-    
-    
+    const compoundSummary = summarizeBetResults<string, 'threshold' | 'bet_type'>(filtered, (r) => `${r.threshold}|${r.bet_type}`, { additionalFields: ['threshold', 'bet_type']})
+    const chartsByThreshold = new Map<number, typeof compoundSummary>()
+    compoundSummary.forEach((result) => {
+        const threshold = result.threshold ?? 0
+
+        if (!chartsByThreshold.has(threshold)) {
+            chartsByThreshold.set(threshold,[result])
+        }
+        else {
+            chartsByThreshold.get(threshold)?.push(result)
+        }
+    })
+
+    const maxBets = Math.max(...compoundSummary.map(r => r.total_bets))
     return (
         <div className="mx-auto max-w-8xl p-6">
             <div className='grid grid-cols-3 mt-5 p-10 w-125 items-center'>
@@ -167,8 +179,82 @@ export function ResultsPage(){
                     rowKey={(row) => String(row.summary_pivot)}
                     rowClassName={(row) => (row.summary_pivot === 'Total' ? 'font-bold' : '')}
                     />
-                
+                    <h1 className='text-3xl font-bold p-5 mt-10'>Breakdown By Threshold</h1>
+                    <div className='grid grid-cols-2 gap-4 w-250'>
+                        {[...chartsByThreshold.entries()].map(([threshold, data]) => {
+                            const barData = data.map(row => ({
+                                bet_type: row.bet_type,
+                                total_hits: row.hits,
+                                total_misses: (row.total_bets - row.hits),
+                                hit_rate: row.hit_rate
+                            
+                        }))
+                        return (
+                        <div>
+                            <h2 className='text-xl font-bold m-5'>{`Bet Line Threshold ${threshold}`}</h2>
+                            <ResponsiveContainer
+                                height={400}
+                                width={400}
+                                key={threshold}
+                            >
+                                <BarChart
+                                    title={`Bet Line Threshold ${threshold}`}
+                                    barCategoryGap="10%"
+                                    barGap={4}
+                                    data={barData}
+                                    id="BarChart-Stacked"
+                                    layout="horizontal"
+                                    stackOffset='none'
+                                >
+                                    <CartesianGrid strokeDasharray={"3 3"} stroke='grey' />
+                                    <XAxis 
+                                        dataKey={"bet_type"} 
+                                        label={{ value: 'Bet Type', position: 'insideBottom', offset: 10, fill: '#ffffff' }}
+                                        tick={{ fontSize: 12, fill: '#ffffff' }}
+                                        height={60}
+                                        stroke='#ffffff'
+                                    />
+                                    <YAxis 
+                                        domain={[0, maxBets + 50]}
+                                        tick={{ fontSize: 12, fill: '#ffffff' }}
+                                        label={{ value: 'Total Bets', angle: -90, position: 'insideLeft', fill: '#ffffff' }}
+                                        height={60}
+                                        stroke='#ffffff'
+                                    />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Bar 
+                                        stackId='a'
+                                        barSize={50}
+                                        dataKey={"total_hits"}
+                                        fill='#0ffa26'
+                                        name="Hits"
+                                    />
+                                    <Bar 
+                                        stackId='a'
+                                        barSize={50}
+                                        dataKey={"total_misses"}
+                                        fill='#ef4444'
+                                        name="Misses"
+                                        label={({ x, y, width, index }: any) => (
+                                            <text
+                                                x={x + width / 2}
+                                                y={y - 10}
+                                                textAnchor="middle"
+                                                fill="#ffffff"
+                                            >
+                                               {`${(barData[index]?.hit_rate * 100).toFixed(1)}%`}
+                                            </text>
+                                        )}
+                    
+                                    />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                        )})}  
+                    </div>
                 </div>
+                
             ) : (
                 <div>No Data Found</div>
             )}
