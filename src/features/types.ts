@@ -167,7 +167,7 @@ export type FilterState = {
 
 export type CalibrationResult = {
   bucketWidth: number
-  bucketMidPoint: number
+  bucketLowerBound: number
   totalBets: number
   totalHits: number
   hitRate: number

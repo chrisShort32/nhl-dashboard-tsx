@@ -141,13 +141,17 @@ export function tabDateFilter(betResults: BetResult[], tabValue: string) : BetRe
     return betResults
 }
 
-export function calibration(betResults: BetResult[], bucketWidth: number, maxLowerBound: number) : CalibrationResult[] {
+export function calibration(betResults: BetResult[], bucketWidth: number, maxLowerBound: number, bucketData: 'bet_p' | 'edge') : CalibrationResult[] {
     if (betResults.length === 0) return []
     const bucketMap = new Map<number, CalibrationResult>()
     
+
     betResults.forEach((result) => {
-        const betP = result.bet_p
-        const bucketNumber = Math.floor(betP / bucketWidth)
+        
+        const pivot = bucketData === 'bet_p' ? result.bet_p : result.bet_edge
+        
+
+        const bucketNumber = Math.floor(pivot / bucketWidth)
         let lowerBound = bucketNumber * bucketWidth
         if (lowerBound > maxLowerBound) {
             lowerBound = maxLowerBound
@@ -156,7 +160,7 @@ export function calibration(betResults: BetResult[], bucketWidth: number, maxLow
         if (!bucketMap.has(lowerBound)) {
             bucketMap.set(lowerBound, {
                 bucketWidth,
-                bucketMidPoint: lowerBound + (bucketWidth / 2),
+                bucketLowerBound: lowerBound,
                 totalBets: 0,
                 totalHits: 0,
                 hitRate: 0,
@@ -177,7 +181,7 @@ export function calibration(betResults: BetResult[], bucketWidth: number, maxLow
         calibrationResults.push(bucket)
     })
     
-    calibrationResults.sort((a,b) => a.bucketMidPoint - b.bucketMidPoint)
+    calibrationResults.sort((a,b) => a.bucketLowerBound - b.bucketLowerBound)
 
     return calibrationResults  
 }
