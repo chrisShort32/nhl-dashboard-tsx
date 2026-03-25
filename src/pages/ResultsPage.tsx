@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { FilterState } from '@/features/types'
 import { useBetResults } from '@/features/queries'
 import { DataTable } from '@/components/ui/DataTable' 
-import { applyFilters, computeCumulativeProfit, summarizeBetResults } from '@/features/betting/utils'
+import { applyFilters, calibration, computeCumulativeProfit, summarizeBetResults } from '@/features/betting/utils'
 import { ResponsiveContainer, CartesianGrid, Line, LineChart, BarChart, Bar, Legend, XAxis, YAxis, Tooltip, ReferenceLine } from 'recharts'
 
 const DATE_RANGE_OPTIONS = [
@@ -37,10 +37,20 @@ export function ResultsPage() {
     const todayString = today.toISOString().split('T')[0]
     const {data: betResults, isLoading, isError} = useBetResults('01-01-2026', todayString)
     const filtered = betResults ? applyFilters(betResults, filter) : []
-
+    
+    // calibration data
+    const CALIBRATION_MAX = 0.70 // max bet_p for buckets
+    const CALIBRATION_BUCKET_WIDTH = 0.0125
+    const calibrationFilter = { ...filter, dateRange: 'all' as const }
+    const calibrationData = betResults ? applyFilters(betResults, calibrationFilter) : []
+    const calibrationBuckets = calibration(calibrationData, CALIBRATION_BUCKET_WIDTH, CALIBRATION_MAX)
+    
+    // data for the profit line graph
     const chartData = computeCumulativeProfit(filtered)
     const betSummaryThreshold = summarizeBetResults<number>(filtered, 'threshold', { includeTotals: true })
     const betSummaryBetType = summarizeBetResults<string>(filtered, 'bet_type', { includeTotals: true })
+    
+    // summary of bet types by threshold together
     const compoundSummary = summarizeBetResults<string, 'threshold' | 'bet_type'>(filtered, (r) => `${r.threshold}|${r.bet_type}`, { additionalFields: ['threshold', 'bet_type']})
     const chartsByThreshold = new Map<number, typeof compoundSummary>()
     compoundSummary.forEach((result) => {
@@ -53,8 +63,9 @@ export function ResultsPage() {
             chartsByThreshold.get(threshold)?.push(result)
         }
     })
-
     const maxBets = Math.max(...compoundSummary.map(r => r.total_bets))
+
+
     return (
         <div className="mx-auto max-w-8xl p-6">
             <div className='grid grid-cols-3 mt-5 p-10 w-125 items-center'>
@@ -107,9 +118,9 @@ export function ResultsPage() {
 
             </div>
             {isLoading ? (
-                <div>Loading Chart Data...</div>
+                <div>Loading Data...</div>
             ) : isError ? (
-                <div>Error fetching Chart Data</div>
+                <div>Error fetching Data</div>
             ) : chartData ? (
                 <div className='ml-5'>
                     <h1 className='text-3xl font-bold p-5 m-5'>Profit Over Time</h1>
@@ -190,12 +201,11 @@ export function ResultsPage() {
                             
                         }))
                         return (
-                        <div>
+                        <div key={threshold}>
                             <h2 className='text-xl font-bold m-5'>{`Bet Line Threshold ${threshold}`}</h2>
                             <ResponsiveContainer
                                 height={400}
                                 width={400}
-                                key={threshold}
                             >
                                 <BarChart
                                     title={`Bet Line Threshold ${threshold}`}
@@ -229,6 +239,20 @@ export function ResultsPage() {
                                         dataKey={"total_hits"}
                                         fill='#0ffa26'
                                         name="Hits"
+                                        label={({ x, y, width, index }: any) => {
+                                            if (!barData[index]) return null
+                                            if (barData[index].total_misses > 0) return null
+                                            return (
+                                                <text
+                                                    x={x + width / 2}
+                                                    y={y - 10}
+                                                    textAnchor="middle"
+                                                    fill="#ffffff"
+                                                >
+                                                    {`${(barData[index].hit_rate * 100).toFixed(1)}%`}
+                                                </text>
+                                            )
+                                        }}
                                     />
                                     <Bar 
                                         stackId='a'
@@ -236,22 +260,107 @@ export function ResultsPage() {
                                         dataKey={"total_misses"}
                                         fill='#ef4444'
                                         name="Misses"
-                                        label={({ x, y, width, index }: any) => (
+                                        label={({ x, y, width, index }: any) => {
+                                            if (!barData[index]) return null
+                                            return (
                                             <text
                                                 x={x + width / 2}
                                                 y={y - 10}
                                                 textAnchor="middle"
                                                 fill="#ffffff"
                                             >
-                                               {`${(barData[index]?.hit_rate * 100).toFixed(1)}%`}
+                                               {`${(barData[index].hit_rate * 100).toFixed(1)}%`}
                                             </text>
-                                        )}
+                                        )    
+                                    }}
                     
                                     />
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
                         )})}  
+                    </div>
+                    <div className='m-5'>
+                        <h1 className='text-3xl font-bold p-5 m-5'>Model Calibration</h1>
+                        <ResponsiveContainer width="90%" height={500}>
+                            <LineChart data={calibrationBuckets}>
+                                <CartesianGrid strokeDasharray="5 5" stroke='grey'/>
+                                <XAxis 
+                                    dataKey="bucketMidPoint" 
+                                    tickFormatter={(value: number) => {
+                                        if (value >= CALIBRATION_MAX) return `${CALIBRATION_MAX}+`
+                                        return `${(value * 100).toFixed(1)}%`
+                                    }}
+                                    tick={{ fontSize: 12, fill: '#ffffff' }}
+                                    label={{ value: 'Bet Probability', position: 'insideBottom', offset: 0, fill: '#ffffff' }}
+                                    height={60}
+                                    stroke='#ffffff'
+                                />
+                                <YAxis
+                                    domain={[
+                                    (dataMin: number) => Math.min(0.10, Number(dataMin.toFixed(2))),
+                                    (dataMax: number) => Math.max(1, Number(dataMax.toFixed(2)))
+                                    ]} 
+                                    tick={{ fontSize: 12, fill: '#ffffff' }}
+                                    label={{ value: 'Hit Rate', angle: -90, position: 'insideLeft', fill: '#ffffff' }}
+                                    stroke='#ffffff'
+                                />
+        
+                                <Tooltip />
+                                <Line 
+                                    type='monotone'
+                                    dataKey='bucketMidPoint'
+                                    stroke='#0ffa26'
+                                    dot={false}
+                                    strokeDasharray="5 5"
+                                    name="Perfect Calibration"
+                                />
+                                <Line 
+                                    type="monotone" 
+                                    dataKey="hitRate" 
+                                    stroke="#6366f1" 
+                                    dot={true}
+                                />
+                            </LineChart>
+                        </ResponsiveContainer>
+                        <div className='mt-5'>
+                            <ResponsiveContainer width="90%" height={500}>
+                                <LineChart data={calibrationBuckets}>
+                                    <CartesianGrid strokeDasharray="5 5" stroke='grey'/>
+                                    <XAxis 
+                                        dataKey="bucketMidPoint" 
+                                        tickFormatter={(value: number) => {
+                                            if (value >= CALIBRATION_MAX) return '75%+'
+                                            return `${(value * 100).toFixed(1)}%`
+                                        }}
+                                        tick={{ fontSize: 12, fill: '#ffffff' }}
+                                        label={{ value: 'Bet Probability', position: 'insideBottom', offset: 0, fill: '#ffffff' }}
+                                        height={60}
+                                        stroke='#ffffff'
+                                    />
+                                    <YAxis
+                                        domain={[
+                                        (dataMin: number) => Math.min(-10, Number(dataMin.toFixed(2))),
+                                        (dataMax: number) => Math.max(40, Number(dataMax.toFixed(2)))
+                                        ]} 
+                                        tickFormatter={(value: number) => `$${value.toFixed(0)}`}
+                                        tick={{ fontSize: 12, fill: '#ffffff' }}
+                                        label={{ value: 'Profit', angle: -90, position: 'insideLeft', fill: '#ffffff' }}
+                                        stroke='#ffffff'
+                                    />
+            
+                                    <Tooltip />
+                                    
+                                    <Line 
+                                        type="monotone" 
+                                        dataKey="profit" 
+                                        stroke="#6366f1" 
+                                        dot={true}
+                                    />
+                                    <ReferenceLine y={0} stroke="gold" label={{fill: 'white', value: "Break Even"}}/>
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
                     </div>
                 </div>
                 

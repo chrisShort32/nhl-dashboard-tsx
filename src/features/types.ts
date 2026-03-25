@@ -164,4 +164,14 @@ export type FilterState = {
   typeFilter: 'over' | 'single' | 'value' | 'parlay' | 'under' | 'all'
   thresholdFilter: 2 | 3 | 4 | 5 | 'all'
 }
+
+export type CalibrationResult = {
+  bucketWidth: number
+  bucketMidPoint: number
+  totalBets: number
+  totalHits: number
+  hitRate: number
+  profit: number
+} 
+
                       
