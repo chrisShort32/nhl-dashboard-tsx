@@ -4,6 +4,7 @@ import { useBetResults } from '@/features/queries'
 import { DataTable } from '@/components/ui/DataTable' 
 import { applyFilters, calibration, computeCumulativeProfit, summarizeBetResults } from '@/features/betting/utils'
 import { ResponsiveContainer, CartesianGrid, Line, LineChart, BarChart, Bar, Legend, XAxis, YAxis, Tooltip, ReferenceLine } from 'recharts'
+import { AnalysisChart } from '@/features/betting/components/AnalysisChart'
 
 const DATE_RANGE_OPTIONS = [
     { label: 'Yesterday', value: 0 },
@@ -44,7 +45,11 @@ export function ResultsPage() {
     const calibrationFilter = { ...filter, dateRange: 'all' as const }
     const calibrationData = betResults ? applyFilters(betResults, calibrationFilter) : []
     const calibrationBuckets = calibration(calibrationData, CALIBRATION_BUCKET_WIDTH, CALIBRATION_MAX, 'bet_p')
-    const edgeBuckets = calibration(calibrationData, CALIBRATION_BUCKET_WIDTH, CALIBRATION_MAX, 'edge')
+    
+    // edge data
+    const EDGE_MAX = 0.3 // max edge for buckets
+    const EDGE_BUCKET_WIDTH = 0.025
+    const edgeBuckets = calibration(calibrationData, EDGE_BUCKET_WIDTH, EDGE_MAX, 'edge')
     
     // data for the profit line graph
     const chartData = computeCumulativeProfit(filtered)
@@ -65,7 +70,6 @@ export function ResultsPage() {
         }
     })
     const maxBets = Math.max(...compoundSummary.map(r => r.total_bets))
-
 
     return (
         <div className="mx-auto max-w-8xl p-6">
@@ -131,7 +135,7 @@ export function ResultsPage() {
                             <XAxis 
                                 dataKey="game_date" 
                                 tick={{ fontSize: 12, fill: '#ffffff' }}
-                                label={{ value: 'Date', position: 'insideBottom', offset: -5, fill: '#ffffff' }}
+                                label={{ value: 'Date', position: 'insideBottom', offset: 0, fill: '#ffffff' }}
                                 height={60}
                                 stroke='#ffffff'
                             />
@@ -274,7 +278,6 @@ export function ResultsPage() {
                                             </text>
                                         )    
                                     }}
-                    
                                     />
                                 </BarChart>
                             </ResponsiveContainer>
@@ -283,163 +286,39 @@ export function ResultsPage() {
                     </div>
                     <div className='m-5'>
                         <h1 className='text-3xl font-bold p-5 m-5'>Model Calibration</h1>
-                        <ResponsiveContainer width="90%" height={500}>
-                            <LineChart data={calibrationBuckets}>
-                                <CartesianGrid strokeDasharray="5 5" stroke='grey'/>
-                                <XAxis 
-                                    dataKey="bucketLowerBound" 
-                                    tickFormatter={(value: number) => {
-                                        if (value >= CALIBRATION_MAX) return `${CALIBRATION_MAX}+`
-                                        return `${(value * 100).toFixed(1)}%`
-                                    }}
-                                    tick={{ fontSize: 12, fill: '#ffffff' }}
-                                    label={{ value: 'Bet Probability', position: 'insideBottom', offset: 0, fill: '#ffffff' }}
-                                    height={60}
-                                    stroke='#ffffff'
-                                />
-                                <YAxis
-                                    domain={[
-                                    (dataMin: number) => Math.min(0.10, Number(dataMin.toFixed(2))),
-                                    (dataMax: number) => Math.max(1, Number(dataMax.toFixed(2)))
-                                    ]} 
-                                    tick={{ fontSize: 12, fill: '#ffffff' }}
-                                    label={{ value: 'Hit Rate', angle: -90, position: 'insideLeft', fill: '#ffffff' }}
-                                    stroke='#ffffff'
-                                />
-        
-                                <Tooltip />
-                                <Line 
-                                    type='monotone'
-                                    dataKey='bucketLowerBound'
-                                    stroke='#0ffa26'
-                                    dot={false}
-                                    strokeDasharray="5 5"
-                                    name="Perfect Calibration"
-                                />
-                                <Line 
-                                    type="monotone" 
-                                    dataKey="hitRate" 
-                                    stroke="#6366f1" 
-                                    dot={true}
-                                />
-                            </LineChart>
-                        </ResponsiveContainer>
-                        <div className='mt-5'>
-                            <ResponsiveContainer width="90%" height={500}>
-                                <LineChart data={calibrationBuckets}>
-                                    <CartesianGrid strokeDasharray="5 5" stroke='grey'/>
-                                    <XAxis 
-                                        dataKey="bucketLowerBound" 
-                                        tickFormatter={(value: number) => {
-                                            if (value >= CALIBRATION_MAX) return `${CALIBRATION_MAX}+`
-                                            return `${(value * 100).toFixed(1)}%`
-                                        }}
-                                        tick={{ fontSize: 12, fill: '#ffffff' }}
-                                        label={{ value: 'Bet Probability', position: 'insideBottom', offset: 0, fill: '#ffffff' }}
-                                        height={60}
-                                        stroke='#ffffff'
-                                    />
-                                    <YAxis
-                                        domain={[
-                                        (dataMin: number) => Math.min(-10, Number(dataMin.toFixed(2))),
-                                        (dataMax: number) => Math.max(40, Number(dataMax.toFixed(2)))
-                                        ]} 
-                                        tickFormatter={(value: number) => `$${value.toFixed(0)}`}
-                                        tick={{ fontSize: 12, fill: '#ffffff' }}
-                                        label={{ value: 'Profit', angle: -90, position: 'insideLeft', fill: '#ffffff' }}
-                                        stroke='#ffffff'
-                                    />
-            
-                                    <Tooltip />
-                                    
-                                    <Line 
-                                        type="monotone" 
-                                        dataKey="profit" 
-                                        stroke="#6366f1" 
-                                        dot={true}
-                                    />
-                                    <ReferenceLine y={0} stroke="gold" label={{fill: 'white', value: "Break Even"}}/>
-                                </LineChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </div>
-                    <div className='m-5'>
+
+                        <AnalysisChart 
+                            data={calibrationBuckets}
+                            maxBucket={CALIBRATION_MAX}
+                            bucketWidth={CALIBRATION_BUCKET_WIDTH}
+                            pivot='bet_p'
+                            chartType='hitRate'
+                        />
+                        <AnalysisChart
+                            data={calibrationBuckets}
+                            maxBucket={CALIBRATION_MAX}
+                            bucketWidth={CALIBRATION_BUCKET_WIDTH}
+                            pivot='bet_p'
+                            chartType='profit'
+                        />
+
                         <h1 className='text-3xl font-bold p-5 m-5'>Edge Analysis</h1>
-                        <ResponsiveContainer width="90%" height={500}>
-                            <LineChart data={edgeBuckets}>
-                                <CartesianGrid strokeDasharray="5 5" stroke='grey'/>
-                                <XAxis 
-                                    dataKey="bucketLowerBound" 
-                                    tickFormatter={(value: number) => {
-                                        if (value >= CALIBRATION_MAX) return `${CALIBRATION_MAX}+`
-                                        return `${(value * 100).toFixed(1)}%`
-                                    }}
-                                    tick={{ fontSize: 12, fill: '#ffffff' }}
-                                    label={{ value: 'Bet Edge', position: 'insideBottom', offset: 0, fill: '#ffffff' }}
-                                    height={60}
-                                    stroke='#ffffff'
-                                />
-                                <YAxis
-                                    domain={[
-                                    (dataMin: number) => Math.min(0, 0),
-                                    (dataMax: number) => Math.max(1, Number(dataMax.toFixed(2)))
-                                    ]} 
-                                    tick={{ fontSize: 12, fill: '#ffffff' }}
-                                    label={{ value: 'Hit Rate', angle: -90, position: 'insideLeft', fill: '#ffffff' }}
-                                    stroke='#ffffff'
-                                />
-        
-                                <Tooltip />
-                                <Line 
-                                    type="monotone" 
-                                    dataKey="hitRate" 
-                                    stroke="#6366f1" 
-                                    dot={true}
-                                />
-                                <ReferenceLine y={0.5} stroke="gold" label={{fill: 'white', value: "Chance", position: 'top'}}/>
-                            </LineChart>
-                        </ResponsiveContainer>
-                        <div className='mt-5'>
-                            <ResponsiveContainer width="90%" height={500}>
-                                <LineChart data={edgeBuckets}>
-                                    <CartesianGrid strokeDasharray="5 5" stroke='grey'/>
-                                    <XAxis 
-                                        dataKey="bucketLowerBound" 
-                                        tickFormatter={(value: number) => {
-                                            if (value >= CALIBRATION_MAX) return `${CALIBRATION_MAX}+`
-                                            return `${(value * 100).toFixed(1)}%`
-                                        }}
-                                        tick={{ fontSize: 12, fill: '#ffffff' }}
-                                        label={{ value: 'Bet Edge', position: 'insideBottom', offset: 0, fill: '#ffffff' }}
-                                        height={60}
-                                        stroke='#ffffff'
-                                    />
-                                    <YAxis
-                                        domain={[
-                                        (dataMin: number) => Math.min(-15, Number(dataMin.toFixed(2))),
-                                        (dataMax: number) => Math.max(50, Number(dataMax.toFixed(2)))
-                                        ]} 
-                                        tickFormatter={(value: number) => `$${value.toFixed(0)}`}
-                                        tick={{ fontSize: 12, fill: '#ffffff' }}
-                                        label={{ value: 'Profit', angle: -90, position: 'insideLeft', fill: '#ffffff' }}
-                                        stroke='#ffffff'
-                                    />
-            
-                                    <Tooltip />
-                                    
-                                    <Line 
-                                        type="monotone" 
-                                        dataKey="profit" 
-                                        stroke="#6366f1" 
-                                        dot={true}
-                                    />
-                                    <ReferenceLine y={0} stroke="gold" label={{fill: 'white', value: "Break Even", position: "top"}}/>
-                                </LineChart>
-                            </ResponsiveContainer>
-                        </div>
+                        <AnalysisChart
+                            data={edgeBuckets}
+                            maxBucket={CALIBRATION_MAX}
+                            bucketWidth={CALIBRATION_BUCKET_WIDTH}
+                            pivot='bet_edge'
+                            chartType='hitRate'
+                        />
+                        <AnalysisChart
+                            data={edgeBuckets}
+                            maxBucket={CALIBRATION_MAX}
+                            bucketWidth={CALIBRATION_BUCKET_WIDTH}
+                            pivot='bet_edge'
+                            chartType='profit'
+                        />
                     </div>
-                </div>
-                
+                </div>     
             ) : (
                 <div>No Data Found</div>
             )}
