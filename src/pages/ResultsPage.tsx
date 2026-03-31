@@ -41,13 +41,13 @@ export function ResultsPage() {
     
     // calibration data
     const CALIBRATION_MAX = 0.70 // max bet_p for buckets
-    const CALIBRATION_BUCKET_WIDTH = 0.025
+    const CALIBRATION_BUCKET_WIDTH = 0.05
     const calibrationFilter = { ...filter, dateRange: 'all' as const }
     const calibrationData = betResults ? applyFilters(betResults, calibrationFilter) : []
     const calibrationBuckets = calibration(calibrationData, CALIBRATION_BUCKET_WIDTH, CALIBRATION_MAX, 'bet_p')
     
     // edge data
-    const EDGE_MAX = 0.3 // max edge for buckets
+    const EDGE_MAX = 0.20 // max edge for buckets
     const EDGE_BUCKET_WIDTH = 0.025
     const edgeBuckets = calibration(calibrationData, EDGE_BUCKET_WIDTH, EDGE_MAX, 'edge')
     
@@ -199,12 +199,15 @@ export function ResultsPage() {
                     <div className='grid grid-cols-2 gap-4 w-250'>
                         {[...chartsByThreshold.entries()].map(([threshold, data]) => {
                             const barData = data.map(row => ({
+                                threshold: threshold,
                                 bet_type: row.bet_type,
                                 total_hits: row.hits,
                                 total_misses: (row.total_bets - row.hits),
                                 hit_rate: row.hit_rate
                             
                         }))
+                        if (threshold === 2) console.log('barData for threshold 2:', JSON.stringify(barData))
+                        
                         return (
                         <div key={threshold}>
                             <h2 className='text-xl font-bold m-5'>{`Bet Line Threshold ${threshold}`}</h2>
@@ -229,8 +232,9 @@ export function ResultsPage() {
                                         height={60}
                                         stroke='#ffffff'
                                     />
+                                    
                                     <YAxis 
-                                        domain={[0, maxBets + 50]}
+                                        domain={[0, maxBets + Math.ceil(maxBets * 0.15)]}
                                         tick={{ fontSize: 12, fill: '#ffffff' }}
                                         label={{ value: 'Total Bets', angle: -90, position: 'insideLeft', fill: '#ffffff' }}
                                         height={60}
@@ -244,20 +248,6 @@ export function ResultsPage() {
                                         dataKey={"total_hits"}
                                         fill='#0ffa26'
                                         name="Hits"
-                                        label={({ x, y, width, index }: any) => {
-                                            if (!barData[index]) return null
-                                            if (barData[index].total_misses > 0) return null
-                                            return (
-                                                <text
-                                                    x={x + width / 2}
-                                                    y={y - 10}
-                                                    textAnchor="middle"
-                                                    fill="#ffffff"
-                                                >
-                                                    {`${(barData[index].hit_rate * 100).toFixed(1)}%`}
-                                                </text>
-                                            )
-                                        }}
                                     />
                                     <Bar 
                                         stackId='a'
@@ -265,19 +255,6 @@ export function ResultsPage() {
                                         dataKey={"total_misses"}
                                         fill='#ef4444'
                                         name="Misses"
-                                        label={({ x, y, width, index }: any) => {
-                                            if (!barData[index]) return null
-                                            return (
-                                            <text
-                                                x={x + width / 2}
-                                                y={y - 10}
-                                                textAnchor="middle"
-                                                fill="#ffffff"
-                                            >
-                                               {`${(barData[index].hit_rate * 100).toFixed(1)}%`}
-                                            </text>
-                                        )    
-                                    }}
                                     />
                                 </BarChart>
                             </ResponsiveContainer>
@@ -305,15 +282,15 @@ export function ResultsPage() {
                         <h1 className='text-3xl font-bold p-5 m-5'>Edge Analysis</h1>
                         <AnalysisChart
                             data={edgeBuckets}
-                            maxBucket={CALIBRATION_MAX}
-                            bucketWidth={CALIBRATION_BUCKET_WIDTH}
+                            maxBucket={EDGE_MAX}
+                            bucketWidth={EDGE_BUCKET_WIDTH}
                             pivot='bet_edge'
                             chartType='hitRate'
                         />
                         <AnalysisChart
                             data={edgeBuckets}
-                            maxBucket={CALIBRATION_MAX}
-                            bucketWidth={CALIBRATION_BUCKET_WIDTH}
+                            maxBucket={EDGE_MAX}
+                            bucketWidth={EDGE_BUCKET_WIDTH}
                             pivot='bet_edge'
                             chartType='profit'
                         />

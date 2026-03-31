@@ -60,7 +60,7 @@ export function AnalysisChart({ chartType, pivot, data, maxBucket } : ChartProps
                     <XAxis 
                         dataKey='bucketLowerBound'
                         tickFormatter={(value: number) => {
-                            if (value >= maxBucket) return `${maxBucket}+`
+                            if (value >= maxBucket) return `${(maxBucket * 100).toFixed(1)}%+`
                             return `${(value * 100).toFixed(1)}%`
                         }}
                         tick={{ fontSize: 12, fill: '#ffffff' }}

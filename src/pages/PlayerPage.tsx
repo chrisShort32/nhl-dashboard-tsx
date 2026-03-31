@@ -10,7 +10,6 @@ export function PlayerPage() {
     const { playerId } = useParams<{ playerId: string }>()
     const [activeView, setActiveView] = useState('season')
     const { data: gamelog, isLoading: isLoadingGamelog, isError: isErrorGamelog} = useGamelog(playerId || '')
-    
     if (!playerId) {
         return <div>Player ID is Undefined</div>
     }
