@@ -5,7 +5,6 @@ import { useState } from 'react'
 import { DataTable } from '@/components/ui/DataTable'
 import { SlateCard } from '@/components/ui/SlateCard'
 
-// Landing page that wires shot-related query data to simple dashboard UI.
 export function DashboardPage() {
   const { data: betResults, isLoading: isLoadingBetResults, isError: isErrorBetResults } = useBetResults()
   const { data: suggestedBets, isLoading: isLoadingSuggested, isError: isErrorSuggested } = useSuggestedBets()
@@ -15,8 +14,8 @@ export function DashboardPage() {
   const filtered = betResults ? tabDateFilter(betResults, activeView) : []
   const betSummaryThreshold = summarizeBetResults<number>(filtered, 'threshold', { includeTotals: true })
   const betSummaryBetType = summarizeBetResults<string>(filtered, 'bet_type', { includeTotals: true })
-
   const suggestedBetsDate = matchupInfo?.[0]?.start_time_UTC.slice(0,10) ?? ''
+  
   return (
     <div className="mx-auto max-w-8xl p-6">
       <h1 className="text-5xl font-bold text-center">NHL Dashboard</h1>
@@ -95,7 +94,7 @@ export function DashboardPage() {
           <div>Loading Suggested Bets...</div>
         ) : isErrorSuggested ? (
           <div>Error Loading Suggested Bets</div>
-        ) : (suggestedBets && suggestedBets.length > 0 ? (
+        ) : ((suggestedBets && suggestedBets.length > 0) && (matchupInfo && matchupInfo.length > 0) ? ( // lol quick and dirty solve for not displaying yesterdays suggested bets when there are no suggested bets for today.
           <div>
             <h1 className='text-3xl font-bold mt-10'>Top Bets Today</h1>
             <DataTable
@@ -130,7 +129,10 @@ export function DashboardPage() {
             />
           </div>
         ) : (
-          <div>No Suggested Bets Found</div>
+          <div>
+            <h1 className='text-3xl font-bold mt-10'>Top Bets Today</h1>
+            <h3 className='text-xl font-bold mt-10'>No Bets Today</h3>
+          </div>
       ))}
     </div>
   )

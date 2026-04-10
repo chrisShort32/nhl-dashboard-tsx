@@ -26,6 +26,7 @@ const BET_TYPE_OPTIONS = [
 const THRESHOLD_OPTIONS = [
     { label: '2', value: 2 },
     { label: '3', value: 3 },
+    { label: '2 and 3', value: 6},
     { label: '4', value: 4 },
     { label: '5', value: 5 },
     { label: 'All', value: 'all' }

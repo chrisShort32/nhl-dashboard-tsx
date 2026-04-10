@@ -16,6 +16,7 @@ type TableProps<T> = {
 }
 
 export function DataTable<T>({ header, data, columns, rowKey, rowClassName, link}: TableProps<T>) {
+    
     return (
         <div className="mt-4">
             {link ? (

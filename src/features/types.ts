@@ -162,7 +162,7 @@ export type MatchupInfo = {
 export type FilterState = {
   dateRange: 0 | 6 | 30 | 90 | 'all'
   typeFilter: 'over' | 'single' | 'value' | 'parlay' | 'under' | 'all'
-  thresholdFilter: 2 | 3 | 4 | 5 | 'all'
+  thresholdFilter: 2 | 3 | 4 | 5 | 6 | 'all'
 }
 
 export type CalibrationResult = {

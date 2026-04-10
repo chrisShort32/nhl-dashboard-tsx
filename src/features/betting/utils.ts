@@ -82,7 +82,7 @@ export function applyFilters(betResults: BetResult[], filterState: FilterState) 
     const typeFilter = filterState.typeFilter
     const filtered = betResults.filter((result) => 
         (dateFilter !== 'all' ? result.game_date >= (dateRange.toISOString().split('T')[0]) : true) &&
-        (thresholdFilter !== 'all' ? result.threshold === (thresholdFilter) : true) &&
+        ((thresholdFilter === 'all' ? true: thresholdFilter === 6 ? result.threshold <= 3 : result.threshold === thresholdFilter)) &&
         ((typeFilter === 'all' ? true : typeFilter === 'over' ? result.bet_type !== 'under' : result.bet_type === typeFilter)))
     return filtered
 }
