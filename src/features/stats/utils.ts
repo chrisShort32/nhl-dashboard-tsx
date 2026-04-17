@@ -2,6 +2,7 @@ import type { PlayerGameLog } from '@/features/types'
 
 export type StatSnapshot = {
     snapshotHorizon: string
+    gamesPlayed: number
     goalsTotal: number
     goalsPerGame: number
     assistsTotal: number
@@ -35,6 +36,7 @@ export function calculatePlayerStats(gamelog: PlayerGameLog[]): StatSnapshot {
     
     return {
         snapshotHorizon,
+        gamesPlayed: games,
         goalsTotal,
         goalsPerGame: gpg,
         assistsTotal,

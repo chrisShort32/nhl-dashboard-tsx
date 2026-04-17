@@ -6,6 +6,7 @@ import { DataTable } from '@/components/ui/DataTable'
 import { Tabs } from '@/components/ui/Tabs'
 import { useState } from 'react'
 
+
 export function PlayerPage() {
     const { playerId } = useParams<{ playerId: string }>()
     const [activeView, setActiveView] = useState('season')
@@ -35,15 +36,10 @@ export function PlayerPage() {
     } else {
       displayData = gamelog
     }
-
     
+
     return (
-      <div className="mx-auto max-w-8xl p-6">
-        <h1 className="text-2xl font-semibold">NHL Dashboard</h1>
-        <p className="mt-2 text-sm text-neutral-600">
-          Vite + React + TypeScript + Tailwind v4
-        </p>
-  
+      <div className="mx-auto max-w-8xl p-6">  
         {displayData && displayData.length > 0 && (
           <div className="flex mt-6">
               <PlayerCard 
@@ -53,20 +49,19 @@ export function PlayerPage() {
                   position={displayData[0].position}
                   sweater_number={displayData[0].sweater_number}
                   team={displayData[0].team}
-                  team_logo={displayData[0].team_logo}
               >
                 <PlayerSnapshot gamelog={displayData}/>
               </PlayerCard> 
-                <div className='mt-25'>
-                <Tabs
-                  tabs={[
-                    {label: 'Last 5', value: 'last5'},
-                    {label: 'Last 10', value: 'last10'},
-                    {label: 'Season', value: 'season'}
-                  ]}
-                  activeTab={activeView}
-                  onChange={setActiveView}
-                />
+                <div className='mt-30 p-5'>
+                  <Tabs
+                    tabs={[
+                      {label: 'Last 5', value: 'last5'},
+                      {label: 'Last 10', value: 'last10'},
+                      {label: 'Season', value: 'season'}
+                    ]}
+                    activeTab={activeView}
+                    onChange={setActiveView}
+                  />
                 </div>
 
           
@@ -78,7 +73,7 @@ export function PlayerPage() {
         {displayData && displayData.length > 0 && (
           <div className="mt-6">
               <DataTable
-                  header="Player Stats -- Change this later"
+                  header="Game Logs"
                   data={displayData}
                   columns={[
                       {label: 'Date', key: 'game_date', className: 'font-bold'},

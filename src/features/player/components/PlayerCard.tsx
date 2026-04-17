@@ -10,7 +10,6 @@ type PlayerCardProps = {
     position: string
     sweater_number: number
     team: string
-    team_logo: string
     children?: React.ReactNode
     
 }
@@ -25,6 +24,7 @@ export function PlayerCard({
     children,
 }: PlayerCardProps) {
 
+
     return (
         <Link to={`/player/${player_id}`}>
             <div className="flex rounded-lg border w-125">
@@ -33,7 +33,7 @@ export function PlayerCard({
                         <img
                             src={headshot_url || defaultHeadshot}
                             alt={player_name}
-                            className="w-27 h-27"
+                            className="w-30 h-30"
                             onError={(e) => {
                                 e.currentTarget.src = defaultHeadshot
                             }}

@@ -12,6 +12,7 @@ export function PlayerSnapshot({ gamelog }: PlayerSnapShotProps) {
         <div className="p-4 ml-15 bg-black-300 rounded-lg">
             <h2 className="text-lg font-bold">{snapshot.snapshotHorizon}</h2>
             <div className="space-y-1 text-sm">
+                <p>Games Played: {snapshot.gamesPlayed}</p>
                 <p>Goals: {snapshot.goalsTotal} ({snapshot.goalsPerGame.toFixed(2)} p/g)</p>
                 <p>Assists: {snapshot.assistsTotal} ({snapshot.assistsPerGame.toFixed(2)} p/g)</p>
                 <p>Points: {snapshot.pointsTotal} ({snapshot.pointsPerGame.toFixed(2)} p/g)</p>
