@@ -145,6 +145,7 @@ export type BetResultSummary<T> = {
 export type TeamInfo = {
   team_abbrev: string
   team_logo: string
+  team_logo_dark: string
   team_wins: number
   team_losses: number
   team_otl: number

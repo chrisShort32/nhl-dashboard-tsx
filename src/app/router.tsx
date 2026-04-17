@@ -2,7 +2,9 @@ import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { PlayerPage } from '@/pages/PlayerPage'
 import { ResultsPage } from '@/pages/ResultsPage'
+import { SuggestedBetsPage } from '@/pages/SuggestedBetsPage'
 import { AppShell } from '@/components/layout/AppShell'
+import { PlayersHomePage } from '@/pages/PlayersHomePage'
 
 // Route table for the SPA. Expand here as new pages are added.
 export const router = createBrowserRouter([
@@ -24,7 +26,7 @@ export const router = createBrowserRouter([
             },
             {
                 path:'players',
-                element: <div>List of players coming soon?</div>
+                element: <PlayersHomePage />
             },
             {
                 path:'results',
@@ -32,7 +34,7 @@ export const router = createBrowserRouter([
             },
             {
                 path:'suggested',
-                element: <div>Suggested page coming soon</div>
+                element: <SuggestedBetsPage />
             },
             {
                 path:'teams',

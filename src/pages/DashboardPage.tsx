@@ -100,7 +100,7 @@ export function DashboardPage() {
             <DataTable
               link="/suggested"
               header={suggestedBetsDate}
-              data={suggestedBets.slice(0,10)}
+              data={suggestedBets.slice(-10)}
               columns= {[
                 {label: 'Player', key: 'player_name'},
                 {label: 'Pos', key: 'position'},

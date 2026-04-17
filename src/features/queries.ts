@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { fetchBetResults, fetchSuggestedBets, fetchMatchups, fetchPlayerGamelog } from './api'
+import { fetchBetResults, fetchSuggestedBets, fetchMatchups, fetchPlayerGamelog, fetchTopPlayers } from './api'
 
 // Query hook for the bet results for the last X games (default to 7)
 export function useBetResults(startDate?: string, endDate?: string) {
@@ -28,5 +28,12 @@ export function useGamelog(playerId: string) {
     return useQuery({
         queryKey: ['player', 'gamelog', playerId],
         queryFn: () => fetchPlayerGamelog(playerId),
+    })
+}
+
+export function useTopPlayers() {
+    return useQuery({
+        queryKey: ['player', 'gamelog'],
+        queryFn: fetchTopPlayers,
     })
 }

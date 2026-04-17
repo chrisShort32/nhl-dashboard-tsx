@@ -1,5 +1,6 @@
 import defaultHeadshot from '@/assets/default-skater.png'
 import { getTeamName } from '@/features/teamNames'
+import { getTeamLogo } from '@/features/teamLogos'
 import { Link } from 'react-router-dom'
 
 type PlayerCardProps = {
@@ -21,10 +22,8 @@ export function PlayerCard({
     position,
     sweater_number,
     team,
-    team_logo,
     children,
 }: PlayerCardProps) {
-
 
     return (
         <Link to={`/player/${player_id}`}>
@@ -42,7 +41,7 @@ export function PlayerCard({
                         <div className="mt-4">
                             <p className="text-sm text-gray-300 mr-5"> #{sweater_number} • {position}</p>
                             <img
-                                src={team_logo}
+                                src={`${getTeamLogo(team, "dark")}`}
                                 alt={`${getTeamName(team)} logo`}
                                 className="w-13 h-13 ml-3"
 

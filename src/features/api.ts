@@ -11,6 +11,11 @@ export async function fetchPlayerGamelog(playerId: string): Promise<PlayerGameLo
     return api.get<PlayerGameLog[]>(`/player-gamelog?player_id=${playerId}`)
 }
 
+// Fetches the full gamelogs of the top 10 players
+export async function fetchTopPlayers(): Promise<PlayerGameLog[][]> {
+    return api.get<PlayerGameLog[][]>(`/top-players`)
+}
+
 // Fetches bet results for the last X games (default to 7)
 export async function fetchBetResults(startDate?: string, endDate?: string): Promise<BetResult[]> {
     let url = '/bet-results?'
