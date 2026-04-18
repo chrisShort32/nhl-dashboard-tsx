@@ -9,6 +9,7 @@ export type PlayerGameIdentifiers = {
 
 // Player identity - for displaying player cards, rosters, etc.
 export type PlayerIdentity = {
+  player_id: string
   player_name: string
   first_name: string
   last_name: string

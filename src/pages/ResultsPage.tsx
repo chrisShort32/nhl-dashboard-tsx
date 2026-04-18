@@ -207,7 +207,6 @@ export function ResultsPage() {
                                 hit_rate: row.hit_rate
                             
                         }))
-                        if (threshold === 2) console.log('barData for threshold 2:', JSON.stringify(barData))
                         
                         return (
                         <div key={threshold}>

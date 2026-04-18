@@ -1,5 +1,5 @@
 import { api } from '@/lib/api'
-import type { PlayerGameLog, SuggestedBet, BetResult, MatchupInfo } from './types'
+import type { PlayerGameLog, SuggestedBet, BetResult, MatchupInfo, PlayerIdentity } from './types'
 
 // Fetches the latest game row for a single player from the backend.
 export async function fetchMatchups(): Promise<MatchupInfo[]> {
@@ -27,4 +27,9 @@ export async function fetchBetResults(startDate?: string, endDate?: string): Pro
 // Fetches suggested bets for todays games
 export async function fetchSuggestedBets(): Promise<SuggestedBet[]> {
     return api.get<SuggestedBet[]>('/suggested-bets')
+}
+
+// Fetches player info for all players with a betting history
+export async function fetchPlayerInfo(): Promise<PlayerIdentity[]> {
+    return api.get<PlayerIdentity[]>('/player-info')
 }
