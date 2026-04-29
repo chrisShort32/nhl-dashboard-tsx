@@ -75,14 +75,15 @@ export function applyFilters(betResults: BetResult[], filterState: FilterState) 
     const maxDate = betResults.reduce((max, r) => r.game_date > max ? r.game_date : max, '')
     const dateRange = new Date(maxDate)
     const dateFilter = filterState.dateRange
-    if (dateFilter !== 'all') {
+    if (dateFilter !== 'all' && dateFilter !== 'playoffs') {
         dateRange.setDate(dateRange.getDate() - dateFilter)
     }
+    const playoffStartDate = new Date('2026-04-18')
     const thresholdFilter = filterState.thresholdFilter
     const typeFilter = filterState.typeFilter
     const filtered = betResults.filter((result) => 
-        (dateFilter !== 'all' ? result.game_date >= (dateRange.toISOString().split('T')[0]) : true) &&
-        ((thresholdFilter === 'all' ? true: thresholdFilter === 6 ? result.threshold <= 3 : result.threshold === thresholdFilter)) &&
+        ((dateFilter === 'all' ? true :  dateFilter === 'playoffs' ? result.game_date >= (playoffStartDate.toISOString().split('T')[0]) : result.game_date >= (dateRange.toISOString().split('T')[0]))) &&
+        ((thresholdFilter === 'all' ? true : thresholdFilter === 6 ? result.threshold <= 3 : result.threshold === thresholdFilter)) &&
         ((typeFilter === 'all' ? true : typeFilter === 'over' ? result.bet_type !== 'under' : result.bet_type === typeFilter)))
     return filtered
 }
@@ -111,7 +112,6 @@ export function computeCumulativeProfit(betResults: BetResult[]) : { game_date: 
 }
 
 export function tabDateFilter(betResults: BetResult[], tabValue: string) : BetResult[] {
-    
     if (betResults.length === 0) return []
     const maxDate = betResults.reduce((max, r) => r.game_date > max ? r.game_date : max, '')
     if (tabValue === 'yesterday') {
@@ -135,6 +135,19 @@ export function tabDateFilter(betResults: BetResult[], tabValue: string) : BetRe
         const fDate = date.toISOString().split('T')[0]
         const filtered = betResults.filter((result) => result.game_date >= (fDate))
 
+        return filtered
+    }
+
+    if (tabValue === 'playoffs') {
+        const playoffStartDate = "2026-04-18"
+        const filtered = betResults.filter((result) => result.game_date >= playoffStartDate)
+
+        return filtered;
+    }
+
+    if (tabValue === 'regSeason') {
+        const playoffStartDate = "2026-04-18"
+        const filtered = betResults.filter((result) => result.game_date < playoffStartDate)
         return filtered
     }
 

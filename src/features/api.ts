@@ -12,8 +12,8 @@ export async function fetchPlayerGamelog(playerId: string): Promise<PlayerGameLo
 }
 
 // Fetches the full gamelogs of the top 10 players
-export async function fetchTopPlayers(): Promise<PlayerGameLog[][]> {
-    return api.get<PlayerGameLog[][]>(`/top-players`)
+export async function fetchTopPlayers(filter: 'regSeason' | 'playoffs'): Promise<PlayerGameLog[][]> {
+    return api.get<PlayerGameLog[][]>(`/top-players?filter=${filter}`)
 }
 
 // Fetches bet results for the last X games (default to 7)

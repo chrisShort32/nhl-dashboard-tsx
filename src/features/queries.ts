@@ -31,10 +31,10 @@ export function useGamelog(playerId: string) {
     })
 }
 
-export function useTopPlayers() {
+export function useTopPlayers(filter: 'regSeason' | 'playoffs') {
     return useQuery({
         queryKey: ['player', 'gamelog'],
-        queryFn: fetchTopPlayers,
+        queryFn: () => fetchTopPlayers(filter),
     })
 }
 

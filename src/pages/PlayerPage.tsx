@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import { useGamelog } from '@/features/queries'
+import { useGamelog, useBetResults } from '@/features/queries'
 import { PlayerSnapshot } from '@/features/player/components/PlayerSnapshot'
 import { PlayerCard } from '@/features/player/components/PlayerCard'
 import { DataTable } from '@/components/ui/DataTable'
@@ -10,7 +10,13 @@ import { useState } from 'react'
 export function PlayerPage() {
     const { playerId } = useParams<{ playerId: string }>()
     const [activeView, setActiveView] = useState('season')
+    const today = new Date()
+    const todayString = today.toISOString().split('T')[0]
     const { data: gamelog, isLoading: isLoadingGamelog, isError: isErrorGamelog} = useGamelog(playerId || '')
+    const { data: betResults, isLoading, isError } = useBetResults('2026-01-01', todayString)
+
+    
+
     if (!playerId) {
         return <div>Player ID is Undefined</div>
     }

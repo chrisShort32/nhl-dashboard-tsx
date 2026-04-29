@@ -2,15 +2,18 @@ import { useTopPlayers, useBetResults, usePlayerInfo } from '@/features/queries'
 import { PlayerSnapshot } from '@/features/player/components/PlayerSnapshot'
 import { PlayerBets } from '@/features/player/components/PlayerBets'
 import { PlayerCard } from '@/features/player/components/PlayerCard'
-import { summarizeBetResults } from '@/features/betting/utils'
-import { useMemo } from 'react'
+import { Tabs } from '@/components/ui/Tabs'
+import { summarizeBetResults, tabDateFilter } from '@/features/betting/utils'
+import { useMemo, useState } from 'react'
 
 export function PlayersHomePage() {
     const today = new Date()
     const todayString = today.toISOString().split('T')[0]
     const { data: betResults, isLoading, isError } = useBetResults('2026-01-01', todayString)
-    const { data: topPlayers, isLoading: isLoadingPlayers, isError: isErrorPlayers } = useTopPlayers()
     const { data: playerInfo, isLoading: isLoadingInfo, isError: isErrorInfo } = usePlayerInfo()
+    const [activeView, setActiveView] = useState('playoffs')
+    const filtered = betResults ? tabDateFilter(betResults, activeView) : []
+    const { data: topPlayers, isLoading: isLoadingPlayers, isError: isErrorPlayers } = useTopPlayers(activeView)
 
     const sortedPlayers = useMemo(() => {
         if(!topPlayers) return []
@@ -22,11 +25,11 @@ export function PlayersHomePage() {
     }, [topPlayers])
 
     const playerBetResults = useMemo(() => {
-        if(!betResults) return []
-        const results =  summarizeBetResults(betResults, 'player_id')
+        if(!filtered) return []
+        const results =  summarizeBetResults(filtered, 'player_id')
         const sorted = results.sort((a,b) => b.profit - a.profit)
         return sorted
-    }, [betResults])
+    }, [filtered])
 
     const winners = playerBetResults.slice(0,12)
     const losers = playerBetResults.slice(-12)
@@ -46,6 +49,14 @@ export function PlayersHomePage() {
     
     return (
         <div className="mx-auto max-w-8xl p-6">
+            <Tabs
+            tabs={[
+              {label: 'Regular Season', value: 'regSeason'},
+              {label: 'Playoffs', value: 'playoffs'},
+            ]}
+            activeTab={activeView}
+            onChange={setActiveView}
+          />
             {isLoadingPlayers ? (
                 <div>Loading Data...</div>
             ) : isErrorPlayers ? (

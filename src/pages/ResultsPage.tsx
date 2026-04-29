@@ -11,6 +11,7 @@ const DATE_RANGE_OPTIONS = [
     { label: 'Last 7', value: 6 },
     { label: 'Last 30', value: 30},
     { label: 'Last 90', value: 90 },
+    { label: 'Playoffs', value: 'playoffs' },
     { label: 'All', value: 'all' }
 ]
 
@@ -81,7 +82,7 @@ export function ResultsPage() {
                      className='w-30 mt-2 bg-indigo-500' 
                      onChange={(e) => {
                         const raw = e.target.value
-                        const parsed = raw === 'all' ? 'all' : Number(raw)
+                        const parsed = raw === 'all' ? 'all' : raw === 'playoffs' ? 'playoffs' :  Number(raw)
                         setFilter(prev => ({ ...prev, dateRange: parsed as FilterState['dateRange']}))}}
                      value={filter.dateRange}
                     >
