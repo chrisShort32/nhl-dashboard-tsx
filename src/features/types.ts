@@ -158,6 +158,7 @@ export type MatchupInfo = {
   away: TeamInfo
   venue: string
   start_time_UTC: string
+  game_date: string
 
 }
 

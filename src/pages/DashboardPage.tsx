@@ -14,8 +14,7 @@ export function DashboardPage() {
   const filtered = betResults ? tabDateFilter(betResults, activeView) : []
   const betSummaryThreshold = summarizeBetResults<number>(filtered, 'threshold', { includeTotals: true })
   const betSummaryBetType = summarizeBetResults<string>(filtered, 'bet_type', { includeTotals: true })
-  const suggestedBetsDate = matchupInfo?.[0]?.start_time_UTC.slice(0,10) ?? ''
-  
+  const suggestedBetsDate = matchupInfo?.[0]?.game_date
   return (
     <div className="mx-auto max-w-8xl p-6">
       <h1 className="text-5xl font-bold text-center">NHL Dashboard</h1>
@@ -99,7 +98,7 @@ export function DashboardPage() {
             <h1 className='text-3xl font-bold mt-10'>Top Bets Today</h1>
             <DataTable
               link="/suggested"
-              header={suggestedBetsDate}
+              header={suggestedBetsDate || 'no data'}
               data={suggestedBets.slice(-10)}
               columns= {[
                 {label: 'Player', key: 'player_name'},
