@@ -44,14 +44,12 @@ export function ResultsPage() {
     // calibration data
     const CALIBRATION_MAX = 0.70 // max bet_p for buckets
     const CALIBRATION_BUCKET_WIDTH = 0.05
-    const calibrationFilter = { ...filter, dateRange: 'all' as const }
-    const calibrationData = betResults ? applyFilters(betResults, calibrationFilter) : []
-    const calibrationBuckets = calibration(calibrationData, CALIBRATION_BUCKET_WIDTH, CALIBRATION_MAX, 'bet_p')
+    const calibrationBuckets = calibration(filtered, CALIBRATION_BUCKET_WIDTH, CALIBRATION_MAX, 'bet_p')
     
     // edge data
     const EDGE_MAX = 0.20 // max edge for buckets
     const EDGE_BUCKET_WIDTH = 0.025
-    const edgeBuckets = calibration(calibrationData, EDGE_BUCKET_WIDTH, EDGE_MAX, 'edge')
+    const edgeBuckets = calibration(filtered, EDGE_BUCKET_WIDTH, EDGE_MAX, 'edge')
     
     // data for the profit line graph
     const chartData = computeCumulativeProfit(filtered)

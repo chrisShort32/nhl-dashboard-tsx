@@ -5,10 +5,12 @@ import { Link } from "react-router-dom";
 
 type TeamCardProps = {
     team_info: TeamInfo
+    children?: React.ReactNode
 }
 
 export function TeamCard({
-    team_info
+    team_info,
+    children
 }: TeamCardProps) {
 
     const team_name = getTeamName(team_info.team_abbrev)
@@ -26,7 +28,7 @@ export function TeamCard({
                     <h2 className="font-bold">{team_name}</h2>
                     <p className="text-sm">{record}</p>
                 </div>
-            
+                {children}
             </div>
         </Link>
     )

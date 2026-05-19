@@ -3,11 +3,14 @@ import type { PlayerGameLog } from "@/features/types";
 
 type PlayerSnapShotProps = {
     gamelog: PlayerGameLog[]
+    playoffs?: boolean
 }
 
-export function PlayerSnapshot({ gamelog }: PlayerSnapShotProps) {
+export function PlayerSnapshot({ gamelog, playoffs }: PlayerSnapShotProps) {
     const snapshot = calculatePlayerStats(gamelog)
-
+    if (playoffs) {
+        snapshot.snapshotHorizon = 'Playoffs'
+    }
     return (
         <div className="p-4 ml-15 bg-black-300 rounded-lg">
             <h2 className="text-lg font-bold">{snapshot.snapshotHorizon}</h2>

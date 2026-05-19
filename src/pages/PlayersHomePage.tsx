@@ -13,7 +13,7 @@ export function PlayersHomePage() {
     const { data: playerInfo, isLoading: isLoadingInfo, isError: isErrorInfo } = usePlayerInfo()
     const [activeView, setActiveView] = useState('playoffs')
     const filtered = betResults ? tabDateFilter(betResults, activeView) : []
-    const { data: topPlayers, isLoading: isLoadingPlayers, isError: isErrorPlayers } = useTopPlayers(activeView)
+    const { data: topPlayers, isLoading: isLoadingPlayers, isError: isErrorPlayers } = useTopPlayers('regSeason')
 
     const sortedPlayers = useMemo(() => {
         if(!topPlayers) return []
@@ -49,21 +49,13 @@ export function PlayersHomePage() {
     
     return (
         <div className="mx-auto max-w-8xl p-6">
-            <Tabs
-            tabs={[
-              {label: 'Regular Season', value: 'regSeason'},
-              {label: 'Playoffs', value: 'playoffs'},
-            ]}
-            activeTab={activeView}
-            onChange={setActiveView}
-          />
             {isLoadingPlayers ? (
                 <div>Loading Data...</div>
             ) : isErrorPlayers ? (
                 <div>Error fetching Data</div>
             ) : topPlayers && topPlayers.length > 0 ? (
                 <div>
-                    <h1 className='text-3xl font-bold mt-10'>Top 12 - Points</h1>
+                    <h1 className='text-3xl font-bold mt-10'>Top 12 - Points (Season)</h1>
                     <div className="grid grid-cols-3 gap-5 mt-4 p-10 w-425">
                         {sortedPlayers.map((games, index) => (
                             <div className="flex" key={index}>
@@ -75,7 +67,9 @@ export function PlayersHomePage() {
                                     sweater_number={games[0].sweater_number}
                                     team={games[0].team}
                                 >
-                                    <PlayerSnapshot gamelog={games}/>
+                                    <PlayerSnapshot 
+                                        gamelog={games}
+                                    />
                                 </PlayerCard>
                             </div>
                         ))}
@@ -84,7 +78,14 @@ export function PlayersHomePage() {
             ) : (
                 <div>No Data Found</div>
             )}
-
+            <Tabs
+                tabs={[
+                {label: 'Regular Season', value: 'regSeason'},
+                {label: 'Playoffs', value: 'playoffs'},
+                ]}
+                activeTab={activeView}
+                onChange={setActiveView}
+          />
             {isLoading || isLoadingInfo ? (
                 <div>Loading Data...</div>
             ) : isError || isErrorInfo ? (

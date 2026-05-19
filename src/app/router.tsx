@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { PlayerPage } from '@/pages/PlayerPage'
+import { TeamPage } from '@/pages/TeamPage'
 import { ResultsPage } from '@/pages/ResultsPage'
 import { SuggestedBetsPage } from '@/pages/SuggestedBetsPage'
 import { AppShell } from '@/components/layout/AppShell'
@@ -38,7 +39,7 @@ export const router = createBrowserRouter([
             },
             {
                 path:'teams',
-                element: <div>Teams Page coming soon</div>
+                element: <TeamPage />
             }
         ]
     }
