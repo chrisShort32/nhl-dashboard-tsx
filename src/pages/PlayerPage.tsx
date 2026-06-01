@@ -13,7 +13,7 @@ export function PlayerPage() {
     const today = new Date()
     const todayString = today.toISOString().split('T')[0]
     const { data: gamelog, isLoading: isLoadingGamelog, isError: isErrorGamelog} = useGamelog(playerId || '')
-    const { data: betResults, isLoading, isError } = useBetResults('2026-01-01', todayString)
+    //const { data: betResults, isLoading, isError } = useBetResults('2026-01-01', todayString)
 
     
 

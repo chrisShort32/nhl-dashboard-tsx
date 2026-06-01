@@ -9,7 +9,8 @@ type PlayerCardProps = {
     headshot_url: string
     position: string
     sweater_number: number
-    team: string
+    team_abbreviation: string
+    team_name: string
     children?: React.ReactNode
     
 }
@@ -20,15 +21,15 @@ export function PlayerCard({
     headshot_url,
     position,
     sweater_number,
-    team,
+    team_abbreviation,
+    team_name,
     children,
 }: PlayerCardProps) {
-
 
     return (
         <Link to={`/player/${player_id}`}>
             <div className="flex rounded-lg border w-125">
-                <div className="pl-6 bg-black-300">
+                <div className="pl-6 bg-black">
                     <div className="flex items-center">
                         <img
                             src={headshot_url || defaultHeadshot}
@@ -41,8 +42,8 @@ export function PlayerCard({
                         <div className="mt-4">
                             <p className="text-sm text-gray-300 mr-5"> #{sweater_number} • {position}</p>
                             <img
-                                src={`${getTeamLogo(team, "dark")}`}
-                                alt={`${getTeamName(team)} logo`}
+                                src={`${getTeamLogo(team_abbreviation, "dark")}`}
+                                alt={team_name}
                                 className="w-13 h-13 ml-3"
 
                             />
@@ -50,7 +51,7 @@ export function PlayerCard({
                     </div>
                     <div>
                         <h2 className="text-lg font-bold">{player_name}</h2>
-                        <span className="text-sm text-gray-300">{getTeamName(team)} ({team})</span>
+                        <span className="text-sm text-gray-300">{team_name} ({team_abbreviation})</span>
                     </div>
                 </div>
                 {children}

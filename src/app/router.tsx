@@ -7,6 +7,7 @@ import { SuggestedBetsPage } from '@/pages/SuggestedBetsPage'
 import { AppShell } from '@/components/layout/AppShell'
 import { PlayersHomePage } from '@/pages/PlayersHomePage'
 
+
 // Route table for the SPA. Expand here as new pages are added.
 export const router = createBrowserRouter([
     { 

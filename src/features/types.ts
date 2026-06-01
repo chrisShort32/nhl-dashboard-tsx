@@ -10,14 +10,16 @@ export type PlayerGameIdentifiers = {
 // Player identity - for displaying player cards, rosters, etc.
 export type PlayerIdentity = {
   player_id: string
-  player_name: string
+  full_name: string
   first_name: string
   last_name: string
   position: string
   sweater_number: number
   headshot_url: string
-  team: string
-  team_logo: string
+  team_name: string
+  team_abbreviation: string
+  team_logo_light: string
+  team_logo_dark: string
 }
 
 // Basic box score stats - most common display needs

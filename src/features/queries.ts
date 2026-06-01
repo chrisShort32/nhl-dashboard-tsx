@@ -38,9 +38,9 @@ export function useTopPlayers(filter: 'regSeason' | 'playoffs') {
     })
 }
 
-export function usePlayerInfo() {
+export function usePlayerInfo(players: number[]) {
     return useQuery({
-        queryKey: ['player', 'playerInfo'],
-        queryFn: fetchPlayerInfo,
+        queryKey: ['player', 'playerInfo', 'players'],
+        queryFn: () => fetchPlayerInfo(players),
     })
 }

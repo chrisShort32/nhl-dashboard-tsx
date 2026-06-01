@@ -30,6 +30,6 @@ export async function fetchSuggestedBets(): Promise<SuggestedBet[]> {
 }
 
 // Fetches player info for all players with a betting history
-export async function fetchPlayerInfo(): Promise<PlayerIdentity[]> {
-    return api.get<PlayerIdentity[]>('/player-info')
+export async function fetchPlayerInfo(players: number[]): Promise<PlayerIdentity[]> {
+    return api.post<PlayerIdentity[]>('/players', players)
 }
