@@ -109,31 +109,20 @@ export type BetResult =  PlayerGameIdentifiers &{
   profit: number
 }
 
-export type SuggestedBet = PlayerGameIdentifiers & {
-  bet_id: string
-  player_name: string
-  position: string
-  team: string
-  opponent: string
+export type SuggestedBet = {
+  player: PlayerIdentity
+  team: PlayerIdentity
+  opp_abbrev: string
   is_home: boolean
+  side: 'over' | 'under'
   bet_type: 'under' | 'single' | 'value' | 'parlay'
   threshold: number
   bet_p: number
   bet_imp: number
+  bet_odds: number
   bet_odds_d: number
   bet_edge: number
-  plr_pre_avg_shots: number
-  plr_pre_avg_att: number
-  plr_roll5_shots: number
-  plr_roll5_att: number
-  plr_roll10_shots: number
-  plr_roll10_att: number
-  plr_roll5_over2_shots: number
-  plr_roll5_over3_shots: number
-  plr_roll5_over4_shots: number
-  plr_roll10_over2_shots: number
-  plr_roll10_over3_shots: number
-  plr_roll10_over4_shots: number
+
 }
 
 

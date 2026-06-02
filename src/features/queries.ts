@@ -20,7 +20,7 @@ export function useBetSummary(params: SummaryParams) {
 // Query hook for today's suggested bet rows.
 export function useSuggestedBets() {
     return useQuery({
-        queryKey: ['suggested-bets', 'today'],
+        queryKey: ['suggested', 'today'],
         queryFn: fetchSuggestedBets,
     })
 }

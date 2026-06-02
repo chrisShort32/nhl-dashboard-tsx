@@ -45,7 +45,7 @@ export async function fetchResultSummary(params: SummaryParams): Promise<BetResu
 
 // Fetches suggested bets for todays games
 export async function fetchSuggestedBets(): Promise<SuggestedBet[]> {
-    return api.get<SuggestedBet[]>('/suggested-bets')
+    return api.get<SuggestedBet[]>('/bets/suggested')
 }
 
 // Fetches player info for all players with a betting history
