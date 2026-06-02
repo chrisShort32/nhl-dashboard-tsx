@@ -3,7 +3,7 @@ import { PlayerSnapshot } from '@/features/player/components/PlayerSnapshot'
 import { PlayerBets } from '@/features/player/components/PlayerBets'
 import { PlayerCard } from '@/features/player/components/PlayerCard'
 import { Tabs } from '@/components/ui/Tabs'
-import { summarizeBetResults, tabDateFilter } from '@/features/betting/utils'
+import { tabDateFilter } from '@/features/betting/utils'
 import { useMemo, useState } from 'react'
 
 export function PlayersHomePage() {
@@ -24,28 +24,7 @@ export function PlayersHomePage() {
         })
     }, [topPlayers])
 
-    const playerBetResults = useMemo(() => {
-        if(!filtered) return []
-        const results =  summarizeBetResults(filtered, 'player_id')
-        const sorted = results.sort((a,b) => b.profit - a.profit)
-        return sorted
-    }, [filtered])
-
-    const winners = playerBetResults.slice(0,12)
-    const losers = playerBetResults.slice(-12)
-    losers.sort((a,b) => a.profit - b.profit)
-
-    const playerById = new Map(playerInfo?.map(p => [p.player_id, p]))
     
-    const winnersInfo = winners.map(winner => ({
-        ...winner,
-        player: playerById.get(winner.summary_pivot as string),
-    }))
-
-    const losersInfo = losers.map(loser => ({
-        ...loser,
-        player: playerById.get(loser.summary_pivot as string),
-    }))
     
     return (
         <div className="mx-auto max-w-8xl p-6">

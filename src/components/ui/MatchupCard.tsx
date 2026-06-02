@@ -9,9 +9,9 @@ export function MatchupCard({
     matchup_info
 }: MatchupCardProps) {
     
-    const home = matchup_info.home
-    const away = matchup_info.away
-    const game_utc = matchup_info.start_time_UTC
+    const home = matchup_info.home_team
+    const away = matchup_info.away_team
+    const game_utc = matchup_info.start_time
     const game_date = new Date(game_utc)
     const day = game_date.toLocaleDateString()
     const time = game_date.toLocaleTimeString()

@@ -158,7 +158,8 @@ export type BetResultSummary<T> = {
 }
 
 export type TeamInfo = {
-  team_abbrev: string
+  abbreviation: string
+  full_name: string
   team_logo: string
   team_logo_dark: string
   team_wins: number
@@ -168,10 +169,10 @@ export type TeamInfo = {
 
 export type MatchupInfo = {
   game_id: number
-  home: TeamInfo
-  away: TeamInfo
+  home_team: TeamInfo
+  away_team: TeamInfo
   venue: string
-  start_time_UTC: string
+  start_time: string
   game_date: string
 
 }

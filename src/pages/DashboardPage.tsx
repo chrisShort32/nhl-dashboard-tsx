@@ -1,5 +1,5 @@
 import { useBetResults, useSuggestedBets, useMatchups, usePlayerInfo, useBetSummary } from '@/features/queries'
-import { summarizeBetResults, tabDateFilter } from '@/features/betting/utils'
+import { tabDateFilter } from '@/features/betting/utils'
 import { Tabs } from '@/components/ui/Tabs'
 import { useState } from 'react'
 import { DataTable } from '@/components/ui/DataTable'
@@ -25,20 +25,34 @@ export function DashboardPage() {
 
   })
 
-  if (!playerInfo || !betSummaryPlayer) {
-    return(<div></div>)
-  }
+  const playerById = new Map(playerInfo?.map(p => [p.id, p]))
 
-  const playerById = new Map(playerInfo.map(p => [p.id, p]))
-
-  const playerBets = betSummaryPlayer.flatMap(s => {          
+  const playerBets = betSummaryPlayer?.flatMap(s => {          
     const player = playerById.get(s.group_key)
     return player ? [{ ...s, player}] : []
-
   })
+
+  const { data: matchupInfo, isLoading: isLoadingMatchup, isError: isErrorMatchup } = useMatchups()
 
   return (
     <div className="mx-auto max-w-8xl p-6">
+        <h1 className="text-5xl font-bold text-center">NHL Dashboard</h1>
+      {isLoadingMatchup ? (
+        <div>Loading Matchup...</div>
+      ) : isErrorMatchup ? (
+        <div>No Matchups Found</div>
+      ) : matchupInfo ? (
+        <div>
+          <SlateCard
+            slate={matchupInfo}
+          />
+        </div>
+      ) : (
+        <div>No Matchups Found</div>
+      )}
+      <div>
+      </div>
+        
         {isLoadingInfo ? (
             <div>Loading Data...</div>
         ) : isErrorInfo ? (

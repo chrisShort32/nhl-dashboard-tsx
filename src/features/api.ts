@@ -3,7 +3,7 @@ import type { PlayerGameLog, SuggestedBet, BetResult, MatchupInfo, PlayerIdentit
 
 // Fetches the latest game row for a single player from the backend.
 export async function fetchMatchups(): Promise<MatchupInfo[]> {
-    return api.get<MatchupInfo[]>('/today-matchups')
+    return api.get<MatchupInfo[]>('/games/today')
 }
 
 // Fetches the full gamelog for a single player from the backend.

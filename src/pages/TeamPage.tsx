@@ -3,7 +3,7 @@ import { TeamCard } from '@/features/team/components/TeamCard'
 import { TeamBets } from '@/features/team/components/TeamBets'
 import { Tabs } from '@/components/ui/Tabs'
 import { DataTable } from '@/components/ui/DataTable'
-import { summarizeBetResults, tabDateFilter } from '@/features/betting/utils'
+import { tabDateFilter } from '@/features/betting/utils'
 import { useMemo, useState } from 'react'
 
 export function TeamPage() {

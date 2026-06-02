@@ -8,7 +8,7 @@ type TeamBetProps = {
 export function TeamBets({ total_bets, hits, hit_rate, average_odds, profit }: TeamBetProps) {
 
     return (
-        <div className="p-4 ml-15 bg-black-300 rounded-lg">
+        <div className="p-4 ml-15 rounded-lg">
             <h2 className="text-lg font-bold">Betting Performance</h2>
             <div className="space-y-1 text-sm">
                 <p>Total Bets: {total_bets}</p>

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { FilterState } from '@/features/types'
 import { useBetResults } from '@/features/queries'
 import { DataTable } from '@/components/ui/DataTable' 
-import { applyFilters, calibration, computeCumulativeProfit, summarizeBetResults } from '@/features/betting/utils'
+import { applyFilters, calibration, computeCumulativeProfit } from '@/features/betting/utils'
 import { ResponsiveContainer, CartesianGrid, Line, LineChart, BarChart, Bar, Legend, XAxis, YAxis, Tooltip, ReferenceLine } from 'recharts'
 import { AnalysisChart } from '@/features/betting/components/AnalysisChart'
 
