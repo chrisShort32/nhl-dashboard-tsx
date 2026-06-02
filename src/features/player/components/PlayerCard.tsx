@@ -29,7 +29,7 @@ export function PlayerCard({
     return (
         <Link to={`/player/${player_id}`}>
             <div className="flex rounded-lg border w-125">
-                <div className="pl-6 bg-black">
+                <div className="pl-6">
                     <div className="flex items-center">
                         <img
                             src={headshot_url || defaultHeadshot}

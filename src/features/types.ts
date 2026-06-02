@@ -9,7 +9,7 @@ export type PlayerGameIdentifiers = {
 
 // Player identity - for displaying player cards, rosters, etc.
 export type PlayerIdentity = {
-  player_id: string
+  id: string
   full_name: string
   first_name: string
   last_name: string
@@ -136,13 +136,25 @@ export type SuggestedBet = PlayerGameIdentifiers & {
   plr_roll10_over4_shots: number
 }
 
+
+export type SummaryParams = {
+    pivot: 'threshold' | 'side' | 'bet_type' | 'player' | 'team',
+    startDate?: string,
+    endDate?: string,
+    teamId?: string,
+    playerId?: string,
+    betType?: 'parlay' | 'value' | 'single' | 'under',
+    side?: 'over' | 'under',
+    threshold?: '2' | '3' | '4' | '5'
+}
+
 export type BetResultSummary<T> = {
-  summary_pivot: T // whatever we group by - bet type, team, player, etc
-  total_bets: number
-  hits: number
+  group_key: T // whatever we group by - bet type, team, player, etc
+  group_label: string
+  n_bets: number
+  n_hits: number
   hit_rate: number
-  average_odds: number
-  profit: number
+  total_profit: number
 }
 
 export type TeamInfo = {

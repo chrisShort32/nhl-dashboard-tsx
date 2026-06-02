@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { fetchBetResults, fetchSuggestedBets, fetchMatchups, fetchPlayerGamelog, fetchTopPlayers, fetchPlayerInfo } from './api'
-
+import { fetchBetResults, fetchSuggestedBets, fetchMatchups, fetchPlayerGamelog, fetchTopPlayers, fetchPlayerInfo, fetchResultSummary } from './api'
+import type { SummaryParams } from '@/features/types'
 // Query hook for the bet results for the last X games (default to 7)
 export function useBetResults(startDate?: string, endDate?: string) {
     return useQuery({
@@ -8,6 +8,15 @@ export function useBetResults(startDate?: string, endDate?: string) {
         queryFn: () => fetchBetResults(startDate, endDate),
     })
 }
+
+// Query hook for bet summarries
+export function useBetSummary(params: SummaryParams) {
+    return useQuery({
+        queryKey: ['summary', params],
+        queryFn: () => fetchResultSummary(params)
+    })
+}
+
 // Query hook for today's suggested bet rows.
 export function useSuggestedBets() {
     return useQuery({
