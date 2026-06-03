@@ -147,6 +147,7 @@ export type BetResultSummary<T> = {
 }
 
 export type TeamInfo = {
+  id: number
   abbreviation: string
   full_name: string
   team_logo: string

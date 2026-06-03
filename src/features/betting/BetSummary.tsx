@@ -1,13 +1,13 @@
-type PlayerBetProps = {
+type BetSummaryProps = {
     total_bets: number,
     hits: number,
     hit_rate: number,
     profit: number
 }
-export function PlayerBets({ total_bets, hits, hit_rate, profit }: PlayerBetProps) {
+export function BetSummary({ total_bets, hits, hit_rate, profit }: BetSummaryProps) {
 
     return (
-        <div className="p-4 ml-15 rounded-lg">
+        <div className="p-4 ml-10 rounded-lg">
             <h2 className="text-lg font-bold">Betting Performance</h2>
             <div className="space-y-1 text-sm">
                 <p>Total Bets: {total_bets}</p>

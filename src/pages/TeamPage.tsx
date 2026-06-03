@@ -1,6 +1,5 @@
 import { useBetResults} from '@/features/queries'
 import { TeamCard } from '@/features/team/components/TeamCard'
-import { TeamBets } from '@/features/team/components/TeamBets'
 import { Tabs } from '@/components/ui/Tabs'
 import { DataTable } from '@/components/ui/DataTable'
 import { tabDateFilter } from '@/features/betting/utils'

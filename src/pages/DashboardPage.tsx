@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { DataTable } from '@/components/ui/DataTable'
 import { SlateCard } from '@/components/ui/SlateCard'
 import { PlayerCard } from '@/features/player/components/PlayerCard'
-import { PlayerBets } from '@/features/player/components/PlayerBets'
+import { BetSummary } from '@/features/betting/BetSummary'
 
 
 
@@ -74,14 +74,14 @@ export function DashboardPage() {
                                 team_abbreviation={players.player.team_abbreviation}
                                 team_name={players.player.team_name}
                             >
-                                <PlayerBets
+                                <BetSummary
                                     total_bets={players.n_bets}
                                     hits={players.n_hits}
                                     hit_rate={players.hit_rate}
                                     profit={players.total_profit}
                                 >
 
-                                </PlayerBets>
+                                </BetSummary>
                 
                             </PlayerCard>
                         </div>

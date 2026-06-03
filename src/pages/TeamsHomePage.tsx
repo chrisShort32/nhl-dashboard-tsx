@@ -1,6 +1,6 @@
 import { TeamCard } from '@/features/team/components/TeamCard'
-import { TeamBets } from '@/features/team/components/TeamBets'
-import { useBetSummary } from '@/features/queries'
+import { useBetSummary, useTeamInfo } from '@/features/queries'
+import { BetSummary } from '@/features/betting/BetSummary'
 
 export function TeamsHomePage(){
     const { data: betSummaryTeam, isLoading: isLoadingSummary, isError: isErrorSummary } = useBetSummary({
@@ -9,54 +9,55 @@ export function TeamsHomePage(){
     endDate: '2026-05-29',
 
   })
-    
+
+  const {data: teamInfo, isLoading: isLoadingInfo, isError: isErrorInfo } = useTeamInfo()
+
+  const teamById = new Map(teamInfo?.map(t => [t.id, t]))
+
+  const teamBets = betSummaryTeam?.flatMap(s => {          
+    const team = teamById.get(Number(s.group_key))
+    return team ? [{ ...s, team}] : []
+  })
+    console.log(betSummaryTeam)
     return (
         <div className="mx-auto max-w-8xl p-6">
-                   {isLoadingSummary ? (
-                   <div>Loading Team Bet Results...</div>
-                   ) : isErrorSummary ? (
-                   <div>Error Loading Suggested Bets</div>
-                   ) : betSummaryTeam && betSummaryTeam.length > 0 ? (
-                       <div>
-                       <h1 className='text-3xl font-bold mt-10'>All Bets Today</h1>
-                       <div className="grid grid-cols-3 gap-5 mt-4 p-10 w-425">
-                           {betSummaryTeam.map((teams, index) => (
-                               
-                               <div className="flex" key={index}>
-                                   <TeamCard
-                                       player_id={players.player.id}
-                                       player_name={players.player.full_name}
-                                       headshot_url={players.player.headshot_url}
-                                       position={players.player.position}
-                                       sweater_number={players.player.sweater_number}
-                                       team_abbreviation={players.team.abbreviation}
-                                       team_name={players.team.full_name}
-                                   >
-                                       <TeamBets
-                                           bet_type={players.bet_type}
-                                           side={players.side}
-                                           threshold={players.threshold}
-                                           bet_odds_decimal={players.bet_odds_d}
-                                           bet_implied_probability={players.bet_imp}
-                                           bet_probability={players.bet_p}
-                                           bet_edge={players.bet_edge}
-                                       >
-                                       </PlayerSuggested>
-                                   </PlayerCard>
-                               </div>
-                           ))}
-                       </div>
-                       </div>
-                   ) : (
-                   <div>
-                       <h1 className='text-3xl font-bold mt-10'>Bet Results By Team</h1>
-                       <h3 className='text-xl font-bold mt-10'>No shits fucked</h3>
-                   </div>   
-               )}
-       
-               </div> 
-       
-             
-           )
-       
-       }
+            {isLoadingSummary ? (
+            <div>Loading Team Bet Results...</div>
+            ) : isErrorSummary ? (
+            <div>Error Loading Suggested Bets</div>
+            ) : teamBets && teamBets.length > 0 ? (
+                <div>
+                <h1 className='text-3xl font-bold mt-10'>Team Bets</h1>
+                <div className="grid grid-cols-3 gap-5 mt-4 p-10 w-425">
+                    {teamBets.map((teams) => (
+                        
+                        <div className="flex" key={teams.group_key}>
+                            <TeamCard
+                                team_info={teams.team}
+                                variant={"bet"}
+                            >
+                                <BetSummary
+                                    total_bets={teams.n_bets}
+                                    hits={teams.n_hits}
+                                    hit_rate={teams.hit_rate}
+                                    profit={teams.total_profit}
+                                >
+                                </BetSummary>
+                            </TeamCard>
+                        </div>
+                    ))}
+                </div>
+                </div>
+            ) : (
+            <div>
+                <h1 className='text-3xl font-bold mt-10'>Bet Results By Team</h1>
+                <h3 className='text-xl font-bold mt-10'>shits fucked</h3>
+            </div>   
+        )}
+
+        </div> 
+
+        
+    )
+
+}

@@ -1,6 +1,6 @@
 import { useTopPlayers, useBetResults, usePlayerInfo } from '@/features/queries'
 import { PlayerSnapshot } from '@/features/player/components/PlayerSnapshot'
-import { PlayerBets } from '@/features/player/components/PlayerBets'
+import { BetSummary } from '@/features/betting/BetSummary'
 import { PlayerCard } from '@/features/player/components/PlayerCard'
 import { Tabs } from '@/components/ui/Tabs'
 import { tabDateFilter } from '@/features/betting/utils'
@@ -83,15 +83,15 @@ export function PlayersHomePage() {
                                     sweater_number={players.player?.sweater_number as number}
                                     team={players.player?.team as string}
                                 >
-                                    <PlayerBets
+                                    <BetSummary
                                         total_bets={players.total_bets}
                                         hits={players.hits}
                                         hit_rate={players.hit_rate}
-                                        average_odds={players.average_odds}
+                                        
                                         profit={players.profit}
                                     >
 
-                                    </PlayerBets>
+                                    </BetSummary>
                                     
                                 </PlayerCard>
                             </div>
@@ -120,15 +120,14 @@ export function PlayersHomePage() {
                                     sweater_number={players.player?.sweater_number as number}
                                     team={players.player?.team as string}
                                 >
-                                    <PlayerBets
+                                    <BetSummary
                                         total_bets={players.total_bets}
                                         hits={players.hits}
                                         hit_rate={players.hit_rate}
-                                        average_odds={players.average_odds}
                                         profit={players.profit}
                                     >
 
-                                    </PlayerBets>
+                                    </BetSummary>
                                     
                                 </PlayerCard>
                             </div>
