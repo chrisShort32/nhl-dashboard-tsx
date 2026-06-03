@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { PlayerPage } from '@/pages/PlayerPage'
-import { TeamPage } from '@/pages/TeamPage'
+import { TeamsHomePage } from '@/pages/TeamsHomePage'
 import { ResultsPage } from '@/pages/ResultsPage'
 import { SuggestedBetsPage } from '@/pages/SuggestedBetsPage'
 import { AppShell } from '@/components/layout/AppShell'
@@ -40,7 +40,7 @@ export const router = createBrowserRouter([
             },
             {
                 path:'teams',
-                element: <TeamPage />
+                element: <TeamsHomePage />
             }
         ]
     }

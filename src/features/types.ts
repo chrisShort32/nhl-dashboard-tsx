@@ -111,7 +111,7 @@ export type BetResult =  PlayerGameIdentifiers &{
 
 export type SuggestedBet = {
   player: PlayerIdentity
-  team: PlayerIdentity
+  team: TeamInfo
   opp_abbrev: string
   is_home: boolean
   side: 'over' | 'under'

@@ -23,8 +23,8 @@ export function SuggestedBetsPage() {
                                 headshot_url={players.player.headshot_url}
                                 position={players.player.position}
                                 sweater_number={players.player.sweater_number}
-                                team_abbreviation={players.team.team_abbreviation}
-                                team_name={players.team.team_name}
+                                team_abbreviation={players.team.abbreviation}
+                                team_name={players.team.full_name}
                             >
                                 <PlayerSuggested
                                     bet_type={players.bet_type}

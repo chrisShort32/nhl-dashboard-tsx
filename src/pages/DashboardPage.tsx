@@ -34,6 +34,7 @@ export function DashboardPage() {
 
   const { data: matchupInfo, isLoading: isLoadingMatchup, isError: isErrorMatchup } = useMatchups()
 
+
   return (
     <div className="mx-auto max-w-8xl p-6">
         <h1 className="text-5xl font-bold text-center">NHL Dashboard</h1>

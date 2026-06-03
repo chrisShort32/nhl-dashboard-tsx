@@ -7,13 +7,14 @@ import { tabDateFilter } from '@/features/betting/utils'
 import { useMemo, useState } from 'react'
 
 export function TeamPage() {
-    const today = new Date()
-    const todayString = today.toISOString().split('T')[0]
-    const { data: betResults, isLoading, isError } = useBetResults('2026-01-01', todayString)
-    const [activeView, setActiveView] = useState('playoffs')
-    const filtered = betResults ? tabDateFilter(betResults, activeView) : []
+const { data: betSummaryTeam, isLoading: isLoadingSummary, isError: isErrorSummary } = useBetSummary({
+    pivot: 'team',
+    startDate: '2026-04-18',
+    endDate: '2026-05-29',
 
-    const teamData = summarizeBetResults(filtered, 'team')
+  })
+   
+
     return (
         <div className="mx-auto max-w-8xl p-6">
             {teamData && teamData.length > 0 && (

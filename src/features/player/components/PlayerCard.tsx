@@ -1,5 +1,4 @@
 import defaultHeadshot from '@/assets/default-skater.png'
-import { getTeamName } from '@/features/teamNames'
 import { getTeamLogo } from '@/features/teamLogos'
 import { Link } from 'react-router-dom'
 
@@ -25,7 +24,6 @@ export function PlayerCard({
     team_name,
     children,
 }: PlayerCardProps) {
-
     return (
         <Link to={`/player/${player_id}`}>
             <div className="flex rounded-lg border w-125">
