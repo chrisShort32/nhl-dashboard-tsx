@@ -35,13 +35,20 @@ const THRESHOLD_OPTIONS = [
 
 
 export function ResultsPage() {
-    const [filter, setFilter] = useState<FilterState>({dateRange: 'all', typeFilter: 'all', thresholdFilter: 'all'})
-    const today = new Date()
-    const todayString = today.toISOString().split('T')[0]
-    const {data: betResults, isLoading, isError} = useBetResults('01-01-2026', todayString)
-    const filtered = betResults ? applyFilters(betResults, filter) : []
+    //const [filter, setFilter] = useState<FilterState>({dateRange: 'all', typeFilter: 'all', thresholdFilter: 'all'})
+    //const today = new Date()
+    //const todayString = today.toISOString().split('T')[0]
+    //const filtered = betResults ? applyFilters(betResults, filter) : []
+    const { data: betResults, isLoading, isError } = useBetResults({
+        playerId: 8481540,
+        startDate: '2026-04-18',
+        endDate: '2026-05-29',
     
-    // calibration data
+      })
+
+    
+    
+    /* // calibration data
     const CALIBRATION_MAX = 0.70 // max bet_p for buckets
     const CALIBRATION_BUCKET_WIDTH = 0.05
     const calibrationBuckets = calibration(filtered, CALIBRATION_BUCKET_WIDTH, CALIBRATION_MAX, 'bet_p')
@@ -70,7 +77,7 @@ export function ResultsPage() {
         }
     })
     const maxBets = Math.max(...compoundSummary.map(r => r.total_bets))
-
+ */
     return (
         <div className="mx-auto max-w-8xl p-6">
             <div className='grid grid-cols-3 mt-5 p-10 w-125 items-center'>

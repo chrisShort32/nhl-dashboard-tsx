@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import type { SummaryParams } from '@/features/types'
+import type { SummaryParams, BetResultParams, GamelogParams } from '@/features/types'
 import { 
     fetchBetResults, 
     fetchSuggestedBets, 
@@ -10,6 +10,14 @@ import {
     fetchResultSummary, 
     fetchTeamInfo 
 } from './api'
+
+// Query hook for the bet results for the last X games (default to 7)
+export function useBetResults(params: BetResultParams) {
+    return useQuery({
+        queryKey: ['results', params],
+        queryFn: () => fetchBetResults(params),
+    })
+}
 
 // Query hook for bet summarries
 export function useBetSummary(params: SummaryParams) {
@@ -51,24 +59,18 @@ export function useTeamInfo() {
     })
 }
 
+// Query hook for player gamelogs
+export function useGamelog(params: GamelogParams) {
+    return useQuery({
+        queryKey: ['player', 'gamelog', params],
+        queryFn: () => fetchPlayerGamelog(params),
+    })
+}
+
 //********************************** */
 // Need to redo the following hooks:
 //********************************** */
 
-// Query hook for the bet results for the last X games (default to 7)
-export function useBetResults(startDate?: string, endDate?: string) {
-    return useQuery({
-        queryKey: ['bet-results', startDate, endDate],
-        queryFn: () => fetchBetResults(startDate, endDate),
-    })
-}
-
-export function useGamelog(playerId: string) {
-    return useQuery({
-        queryKey: ['player', 'gamelog', playerId],
-        queryFn: () => fetchPlayerGamelog(playerId),
-    })
-}
 
 export function useTopPlayers(filter: 'regSeason' | 'playoffs') {
     return useQuery({

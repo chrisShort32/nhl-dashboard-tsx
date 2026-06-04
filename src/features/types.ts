@@ -63,6 +63,7 @@ export type GameContext = {
   opponent: string
   opponent_logo: string
   is_home: boolean
+  is_playoffs: boolean
   team_shots: number
   team_goals: number
   team_shots_against: number
@@ -78,32 +79,44 @@ export type GameContext = {
   start_time_UTC: string
 }
 
+export type GamelogParams = {
+  playerId: string,  
+  startDate?: string,
+  endDate?: string,
+  season?: string,
+  playoffs?: string,
+}
 // Composed for full game log
 export type PlayerGameLog = PlayerGameIdentifiers &
-                            PlayerIdentity &
                             PlayerBoxScore &
                             PlayerShotMetrics &
                             GameContext
 
+export type BetResultParams = {
+  startDate?: string,
+  endDate?: string,
+  teamId?: string,
+  playerId?: string,
+  betType?: 'parlay' | 'value' | 'single' | 'under',
+  side?: 'over' | 'under',
+  threshold?: '2' | '3' | '4' | '5'
+}
 // bet results - for betting analytics views
 export type BetResult =  PlayerGameIdentifiers &{
-  player_name: string
-  position: string
-  team: string
-  opponent: string
+  bet_date: string
+  player_id: number
+  full_name: string
+  team_abbrev: string
+  opp_abbrev: string
   is_home: boolean
-  game_outcome: 'W' | 'L' | 'OTL'
-  team_goals: number
-  team_goals_against: number
-  toi: string
-  pim: number
   actual_sog: number
-  shot_attempts_total: number
   bet_type: 'under' | 'single' | 'value' | 'parlay'
+  side: 'over' | 'under'
   threshold: number 
-  bet_p: number
-  bet_imp: number
-  bet_odds_d: number
+  bet_probability: number
+  bet_implied_probability: number
+  bet_odds_decimal: number
+  bet_odds_american: number
   bet_edge: number
   hit: number
   profit: number
@@ -124,7 +137,6 @@ export type SuggestedBet = {
   bet_edge: number
 
 }
-
 
 export type SummaryParams = {
     pivot: 'threshold' | 'side' | 'bet_type' | 'player' | 'team',

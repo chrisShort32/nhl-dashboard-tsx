@@ -16,14 +16,14 @@ const { data: betSummaryTeam, isLoading: isLoadingSummary, isError: isErrorSumma
 
     return (
         <div className="mx-auto max-w-8xl p-6">
-            {teamData && teamData.length > 0 && (
+            {betSummaryTeam && betSummaryTeam.length > 0 && (
           <div className="mt-6">      
               <DataTable
                 link="/results"
                 header="Bet Results By Team"
-                data={teamData}
+                data={betSummaryTeam}
                 columns= {[
-                {label: 'Threshold', key: 'summary_pivot'},
+                {label: 'Team', key: ''},
                 {label: 'Total Bets', key: 'total_bets'},
                 {label: 'Hits', key: 'hits'},
                 {label: 'Hit Rate', key: 'hit_rate', format: (value) => `${(value * 100).toFixed(1)}%`},

@@ -17,11 +17,7 @@ export function PlayerSuggested({
     bet_probability, 
     bet_edge 
 }: PlayerSuggestedProps) {
-    if (side == 'over') {
-        threshold += 0.5
-    } else {
-        threshold -= 0.5
-    }
+    threshold -=0.5
     return (
         <div className="p-2 ml-15 rounded-lg">
             <h2 className="text-lg font-bold">Suggested Bet</h2>

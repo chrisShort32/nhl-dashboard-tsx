@@ -1,5 +1,17 @@
 import { api } from '@/lib/api'
-import type { PlayerGameLog, SuggestedBet, BetResult, MatchupInfo, PlayerIdentity, BetResultSummary, SummaryParams, TeamInfo} from './types'
+import type { 
+    PlayerGameLog, 
+    SuggestedBet, 
+    BetResult, 
+    MatchupInfo, 
+    PlayerIdentity, 
+    BetResultSummary, 
+    SummaryParams, 
+    BetResultParams,
+    GamelogParams,
+    TeamInfo
+
+} from './types'
 
 // Fetches the latest game row for a single player from the backend.
 export async function fetchMatchups(): Promise<MatchupInfo[]> {
@@ -7,8 +19,15 @@ export async function fetchMatchups(): Promise<MatchupInfo[]> {
 }
 
 // Fetches the full gamelog for a single player from the backend.
-export async function fetchPlayerGamelog(playerId: string): Promise<PlayerGameLog[]> {
-    return api.get<PlayerGameLog[]>(`/player-gamelog?player_id=${playerId}`)
+export async function fetchPlayerGamelog(params: GamelogParams): Promise<PlayerGameLog[]> {
+    const qs = new URLSearchParams()
+
+    if (params.startDate) qs.set('start_date', params.startDate)
+    if (params.endDate) qs.set('end_date', params.endDate)
+    if (params.season) qs.set('season', params.season)
+    if (params.playoffs) qs.set('playoffs', params.playoffs)
+    
+    return api.get<PlayerGameLog[]>(`/players/${params.playerId}/gamelogs?${qs}`)
 }
 
 // Fetches the full gamelogs of the top 10 players
@@ -19,11 +38,18 @@ export async function fetchTopPlayers(filter: 'regSeason' | 'playoffs'): Promise
 // Fetches bet results for the given date range (default is all)
 // Note that the endpoint supports filtering on threshold, side, bet_type, player_id, team_id, in addition to date
 // Will update accordingly soon
-export async function fetchBetResults(startDate?: string, endDate?: string): Promise<BetResult[]> {
-    let url = '/bets/results?'
-    if (startDate) url += `start_date=${startDate}&`
-    if (endDate) url += `end_date=${endDate}`
-    return api.get<BetResult[]>(url)
+export async function fetchBetResults(params : BetResultParams): Promise<BetResult[]> {
+    const qs = new URLSearchParams()
+
+    if (params.startDate) qs.set('start_date', params.startDate)
+    if (params.endDate) qs.set('end_date', params.endDate)
+    if (params.teamId) qs.set('team_id', params.teamId)
+    if (params.playerId) qs.set('player_id', params.playerId)
+    if (params.betType) qs.set('bet_type', params.betType)
+    if (params.side) qs.set('side', params.side)
+    if (params.threshold) qs.set('threshold', params.threshold)
+
+    return api.get<BetResult[]>(`/bets/results/?${qs}`)
 }
 
 // Fetches bet result summarries based on a pivot of threshold, side, bet_type, player_id, or team_id over a given date range

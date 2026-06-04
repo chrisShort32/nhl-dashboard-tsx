@@ -18,8 +18,8 @@ export function TeamCard({
     //const record = team_info.team_wins + " - " + team_info.team_losses + " - " + team_info.team_otl
     const base = "flex rounded-lg border bg-gray-300 items-center hover:bg-indigo-200"
     const variants = {
-        matchup: {container: "w-70 h-17", group: "flex", logo: "w-20 h-20", name: "font-bold"},
-        bet: {container: "w-125 p-2", group: "flex flex-col", logo: "w-30 h-30", name: "font-bold text-xl"}
+        matchup: {container: "w-70 h-17", group: "flex", logo: "w-20 h-20", name: "font-bold mt-6"},
+        bet: {container: "w-125 p-2", group: "flex-col", logo: "w-30 h-30", name: "font-bold text-xl"}
     }
     const v = variants[variant]
 
