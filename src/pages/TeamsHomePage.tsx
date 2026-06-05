@@ -28,7 +28,7 @@ export function TeamsHomePage(){
             ) : teamBets && teamBets.length > 0 ? (
                 <div>
                 <h1 className='text-3xl font-bold mt-10'>Team Bets</h1>
-                <div className="grid grid-cols-3 gap-5 mt-4 p-10 w-425">
+                <div className="grid grid-cols-2 gap-5 mt-4 p-10 w-290">
                     {teamBets.map((teams) => (
                         
                         <div className="flex" key={teams.group_key}>
@@ -37,6 +37,7 @@ export function TeamsHomePage(){
                                 variant={"bet"}
                             >
                                 <BetSummary
+                                    summary_horizon='Bet Results (Playoffs)'
                                     total_bets={teams.n_bets}
                                     hits={teams.n_hits}
                                     hit_rate={teams.hit_rate}

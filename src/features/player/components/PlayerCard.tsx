@@ -26,7 +26,7 @@ export function PlayerCard({
 }: PlayerCardProps) {
     return (
         <Link to={`/player/${player_id}`}>
-            <div className="flex rounded-lg border w-125">
+            <div className="flex rounded-lg border w-3xl items-center">
                 <div className="pl-6">
                     <div className="flex items-center">
                         <img

@@ -64,6 +64,8 @@ export async function fetchResultSummary(params: SummaryParams): Promise<BetResu
     if (params.betType) qs.set('bet_type', params.betType)
     if (params.side) qs.set('side', params.side)
     if (params.threshold) qs.set('threshold', params.threshold)
+    if (params.limit) qs.set('limit', params.limit)
+    if (params.orderBy) qs.set('order_by', params.orderBy)
 
     return api.get<BetResultSummary<string>[]>(`/bets/results/summary?${qs}`)
 

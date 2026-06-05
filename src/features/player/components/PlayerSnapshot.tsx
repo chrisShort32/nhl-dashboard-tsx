@@ -9,7 +9,7 @@ type PlayerSnapShotProps = {
 export function PlayerSnapshot({ gamelog, playoffs }: PlayerSnapShotProps) {
     const snapshot = calculatePlayerStats(gamelog)
     if (playoffs) {
-        snapshot.snapshotHorizon = 'Playoffs'
+        snapshot.snapshotHorizon = 'Playoffs Snapshot'
     }
     return (
         <div className="p-4 ml-15 bg-black-300 rounded-lg">

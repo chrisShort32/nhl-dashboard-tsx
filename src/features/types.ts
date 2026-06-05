@@ -146,7 +146,9 @@ export type SummaryParams = {
     playerId?: string,
     betType?: 'parlay' | 'value' | 'single' | 'under',
     side?: 'over' | 'under',
-    threshold?: '2' | '3' | '4' | '5'
+    threshold?: '2' | '3' | '4' | '5',
+    limit?: string,
+    orderBy?: 'asc' | 'desc'
 }
 
 export type BetResultSummary<T> = {

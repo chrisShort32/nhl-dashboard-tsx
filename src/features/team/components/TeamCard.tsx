@@ -19,7 +19,7 @@ export function TeamCard({
     const base = "flex rounded-lg border bg-gray-300 items-center hover:bg-indigo-200"
     const variants = {
         matchup: {container: "w-70 h-17", group: "flex", logo: "w-20 h-20", name: "font-bold mt-6"},
-        bet: {container: "w-125 p-2", group: "flex-col", logo: "w-30 h-30", name: "font-bold text-xl"}
+        bet: {container: "w-lg p-2", group: "flex-col mr-10", logo: "w-30 h-30", name: "font-bold text-lg"}
     }
     const v = variants[variant]
 
@@ -27,12 +27,12 @@ export function TeamCard({
         <Link to={`/team/${team_info.abbreviation}`}>
             <div className={`${base} ${v.container}`}>
                 <div className={v.group}>
-                <img
-                    src={teamLogo}
-                    alt={`${team_info.full_name} logo`}
-                    className={v.logo}
-                />
-                <h2 className={v.name}>{team_info.full_name}</h2>
+                    <img
+                        src={teamLogo}
+                        alt={`${team_info.full_name} logo`}
+                        className={v.logo}
+                    />
+                    <h2 className={v.name}>{team_info.full_name}</h2>
                 </div>
                 {children}
             </div>

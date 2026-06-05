@@ -19,13 +19,12 @@ export function PlayerSuggested({
 }: PlayerSuggestedProps) {
     threshold -=0.5
     return (
-        <div className="p-2 ml-15 rounded-lg">
+        <div className="p-2 ml-10 rounded-lg">
             <h2 className="text-lg font-bold">Suggested Bet</h2>
             <div className="space-y-1 text-sm">
                 <p>Bet Type: {bet_type} ({side})</p>
-                <p>Line: {threshold}</p>
-                <p>Odds: {(bet_odds_decimal).toFixed(2)}</p>
-                <p>Implied Probability: {(bet_implied_probability * 100).toFixed(2)}%</p>
+                <p>Line: {threshold} | Odds: {(bet_odds_decimal).toFixed(2)}</p>
+                {/* <p>Implied Probability: {(bet_implied_probability * 100).toFixed(2)}%</p> */}
                 <p>Model Probabilty: {(bet_probability * 100).toFixed(2)}%</p>
                 <p>Edge: {(bet_edge * 100).toFixed(2)}%</p>
             </div>

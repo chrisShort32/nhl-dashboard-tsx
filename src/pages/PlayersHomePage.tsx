@@ -1,4 +1,4 @@
-import { useTopPlayers, useBetResults, usePlayerInfo } from '@/features/queries'
+import { useTopPlayers, useBetSummary, usePlayerInfo } from '@/features/queries'
 import { PlayerSnapshot } from '@/features/player/components/PlayerSnapshot'
 import { BetSummary } from '@/features/betting/BetSummary'
 import { PlayerCard } from '@/features/player/components/PlayerCard'
@@ -7,37 +7,127 @@ import { tabDateFilter } from '@/features/betting/utils'
 import { useMemo, useState } from 'react'
 
 export function PlayersHomePage() {
-    const today = new Date()
-    const todayString = today.toISOString().split('T')[0]
-    const { data: betResults, isLoading, isError } = useBetResults('2026-01-01', todayString)
-    const { data: playerInfo, isLoading: isLoadingInfo, isError: isErrorInfo } = usePlayerInfo()
-    const [activeView, setActiveView] = useState('playoffs')
-    const filtered = betResults ? tabDateFilter(betResults, activeView) : []
-    const { data: topPlayers, isLoading: isLoadingPlayers, isError: isErrorPlayers } = useTopPlayers('regSeason')
-
-    const sortedPlayers = useMemo(() => {
-        if(!topPlayers) return []
-        return [...topPlayers].sort((a,b) => {
-            const totalA = a.reduce((sum, game) => sum + game.points, 0)
-            const totalB = b.reduce((sum, game) => sum + game.points, 0)
-            return totalB - totalA
-        })
-    }, [topPlayers])
 
     
+    const { data: betSummaryPlayerTop, isLoading: isLoadingSummaryTop, isError: isErrorSummaryTop } = useBetSummary({
+      pivot: 'player',
+      startDate: '2026-04-18',
+      endDate: '2026-06-04',
+      limit: '12',
+      orderBy: 'desc',
+    })
+    
+    const { data: betSummaryPlayerBottom, isLoading: isLoadingSummaryBottom, isError: isErrorSummaryBottom } = useBetSummary({
+      pivot: 'player',
+      startDate: '2026-04-18',
+      endDate: '2026-06-04',
+      limit: '12',
+      orderBy: 'asc',
+    })
+
+
+    const idsTop = betSummaryPlayerTop?.map(s => Number(s.group_key)) ?? []
+    const idsBottom = betSummaryPlayerBottom?.map(s => Number(s.group_key)) ?? []
+    const ids = idsBottom.concat(idsTop)
+    const players = usePlayerInfo(ids)
+
+    const playerById = new Map(players.data?.map(p => [Number(p.id), p]))
+
+    const topProfit = betSummaryPlayerTop?.flatMap(s => {
+        const player = playerById.get(Number(s.group_key))
+        return player ? [{ ...s, player}] : []
+    })
+
+    const bottomProfit = betSummaryPlayerBottom?.flatMap(s => {
+        const player = playerById.get(Number(s.group_key))
+        return player ? [{ ...s, player}] : []
+    })
+
     
     return (
         <div className="mx-auto max-w-8xl p-6">
-            {isLoadingPlayers ? (
+            
+            {isLoadingSummaryTop ? (
                 <div>Loading Data...</div>
-            ) : isErrorPlayers ? (
+            ) : isErrorSummaryTop ? (
                 <div>Error fetching Data</div>
-            ) : topPlayers && topPlayers.length > 0 ? (
+            ) : topProfit ? (
                 <div>
-                    <h1 className='text-3xl font-bold mt-10'>Top 12 - Points (Season)</h1>
-                    <div className="grid grid-cols-3 gap-5 mt-4 p-10 w-425">
-                        {sortedPlayers.map((games, index) => (
-                            <div className="flex" key={index}>
+                    <h1 className='text-3xl font-bold mt-10'>Top 12 - Profit (SLAM)</h1>
+                    <div className="grid grid-cols-2 gap-5 mt-4 p-10 w-425">
+                        {topProfit?.map((players) => (
+                            <div className="flex" key={players.group_key}>
+                                <PlayerCard
+                                    player_id={players.player.id}
+                                    player_name={players.player.full_name}
+                                    headshot_url={players.player.headshot_url}
+                                    position={players.player.position}
+                                    sweater_number={players.player.sweater_number}
+                                    team_name={players.player.team_name}
+                                    team_abbreviation={players.player.team_abbreviation}
+                                >
+                                    <BetSummary
+                                        total_bets={players.n_bets}
+                                        hits={players.n_hits}
+                                        hit_rate={players.hit_rate}
+                                        profit={players.total_profit}
+                                    >
+                                    </BetSummary>
+                                    
+                                </PlayerCard>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ) : (
+                <div>No Data Found</div>
+            )}
+
+            {isLoadingSummaryBottom ? (
+                <div>Loading Data...</div>
+            ) : isErrorSummaryBottom ? (
+                <div>Error fetching Data</div>
+            ) : bottomProfit ? (
+                <div>
+                    <h1 className='text-3xl font-bold mt-10'>Bottom 12 - Profit (FADE)</h1>
+                    <div className="grid grid-cols-2 gap-5 mt-4 p-10 w-425">
+                        {bottomProfit?.map((players) => (
+                            <div className="flex" key={players.group_key}>
+                                <PlayerCard
+                                    player_id={players.player.id}
+                                    player_name={players.player.full_name}
+                                    headshot_url={players.player.headshot_url}
+                                    position={players.player.position}
+                                    sweater_number={players.player.sweater_number}
+                                    team_name={players.player.team_name}
+                                    team_abbreviation={players.player.team_abbreviation}
+                                >
+                                    <BetSummary
+                                        total_bets={players.n_bets}
+                                        hits={players.n_hits}
+                                        hit_rate={players.hit_rate}
+                                        profit={players.total_profit}
+                                    >
+                                    </BetSummary>
+                                    
+                                </PlayerCard>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ) : (
+                <div>No Data Found</div>
+            )}
+            {/* {isLoadingSummary ? (
+                <div>Loading Data...</div>
+            ) : isErrorSummary ? (
+                <div>Error fetching Data</div>
+            ) : betSummaryPlayer && betSummaryPlayer.length > 0 ? (
+                <div>
+                    <h1 className='text-3xl font-bold mt-10'>Top 12 - Betting (Playoffs)</h1>
+                    <div className="grid grid-cols-1 gap-5 mt-4 p-10 w-425">
+                        {betSummaryPlayer.map((player) => (
+                            <div className="flex" key={player.group_key}>
                                 <PlayerCard
                                     player_id={games[0].player_id}
                                     player_name={games[0].player_name}
@@ -136,7 +226,7 @@ export function PlayersHomePage() {
                 </div>
             ) : (
                 <div>No Data Found</div>
-            )}
+            )} */}
         </div>  
     )
 }

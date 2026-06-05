@@ -21,7 +21,7 @@ export function DashboardPage() {
   const { data: betSummaryPlayer, isLoading: isLoadingSummary, isError: isErrorSummary } = useBetSummary({
     pivot: 'player',
     startDate: '2026-04-18',
-    endDate: '2026-05-29',
+    endDate: '2026-06-04',
 
   })
 
@@ -61,7 +61,7 @@ export function DashboardPage() {
         ) : playerBets && playerBets.length > 0 ? (
             <div>
                 <h1 className='text-3xl font-bold mt-10'>Testing</h1>
-                <div className="grid grid-cols-3 gap-5 mt-4 p-10 w-425">
+                <div className="grid grid-cols-1 gap-5 mt-4 p-10 w-425">
                     {playerBets.map((players, index) => (
                         
                         <div className="flex" key={index}>

@@ -1,66 +1,37 @@
 import { useParams } from 'react-router-dom'
-import { useGamelog, useBetResults, usePlayerInfo } from '@/features/queries'
+import { useGamelog, useBetResults, usePlayerInfo, useBetSummary } from '@/features/queries'
 import { PlayerSnapshot } from '@/features/player/components/PlayerSnapshot'
 import { PlayerCard } from '@/features/player/components/PlayerCard'
 import { DataTable } from '@/components/ui/DataTable'
 import { Tabs } from '@/components/ui/Tabs'
 import { useState } from 'react'
+import { BetSummary } from '@/features/betting/BetSummary'
 
 
 export function PlayerPage() {
     const { playerId } = useParams<{ playerId: string }>()
-    //const [activeView, setActiveView] = useState('season')
-    //const today = new Date()
-    //const todayString = today.toISOString().split('T')[0]
-    const { 
-      data: gamelog, isLoading: isLoadingGamelog, isError: isErrorGamelog } = useGamelog({
+
+    const { data: gamelog, isLoading: isLoadingGamelog, isError: isErrorGamelog } = useGamelog({
       playerId: playerId ? playerId : '1',
       season: '20252026',
       playoffs: 'true'
     })
 
-    
-    const { 
-      data: playerInfo, 
-      isLoading: isLoadingInfo, 
-      isError: isErrorInfo 
+    const { data: playerInfo, isLoading: isLoadingInfo, isError: isErrorInfo 
     } = usePlayerInfo([playerId ? Number(playerId) : 1])
     
     const { data: betResults, isLoading, isError } = useBetResults({
         playerId: playerId,
         startDate: '2026-04-18',
-        endDate: '2026-05-29',
-    
+        endDate: '2026-06-04',
       })
 
-    
-
-    /* if (!playerId) {
-        return <div>Player ID is Undefined</div>
-    }
-    
-    
-    if (isLoadingGamelog) {
-      return <div>Loading Player Data...</div>
-    }
-  
-    if (isErrorGamelog) {
-      return <div>Error Loading PLayer Data</div>
-    }
-  
-    if (!gamelog || gamelog.length === 0) {
-      return <div>No Data Found</div>
-    }
-
-    let displayData = gamelog
-    if (activeView === 'last5') {
-      displayData = gamelog.slice(0,5)
-    } else if (activeView === 'last10') {
-      displayData = gamelog.slice(0,10)
-    } else {
-      displayData = gamelog
-    } */
-    
+    const { data: betSummaryPlayer, isLoading: isLoadingSummary, isError: isErrorSummary } = useBetSummary({
+      pivot: 'player',
+      startDate: '2026-04-18',
+      endDate: '2026-06-04',
+      playerId: playerId,
+    })
 
     return (
       <div className="mx-auto max-w-8xl p-6">  
@@ -68,7 +39,7 @@ export function PlayerPage() {
                 <div>Loading Player Info...</div>
               ) : isErrorInfo ? (
                 <div>No Player Found</div>
-              ) : playerInfo ? (
+              ) : playerInfo && gamelog && betSummaryPlayer? (
                 <div>
                   <PlayerCard 
                     player_id={playerInfo[0].id}
@@ -79,12 +50,31 @@ export function PlayerPage() {
                     team_abbreviation={playerInfo[0].team_abbreviation}
                     team_name={playerInfo[0].team_name}
                   >
+                    <PlayerSnapshot
+                      gamelog={gamelog}
+                      playoffs={true}
+                    >
+                    </PlayerSnapshot>
+
+                    <BetSummary
+                        summary_horizon='Bet Results (Playoffs)'
+                        total_bets={betSummaryPlayer[0].n_bets}
+                        hits={betSummaryPlayer[0].n_hits}
+                        hit_rate={betSummaryPlayer[0].hit_rate}
+                        profit={betSummaryPlayer[0].total_profit}
+                    >
+
+                    </BetSummary>
                   </PlayerCard> 
                 </div>
               ) : (
                 <div>No Player Found</div>
               )}
-        {gamelog && gamelog.length > 0 && (
+        {isLoadingGamelog ? (
+          <div>Loading Gamelogs...</div>
+        ) : isErrorGamelog ? (
+          <div>No Gamelogs Found</div>
+        ) : gamelog ? (
           <div className="mt-6">
               <DataTable
                   header="Gamelogs"
@@ -107,6 +97,8 @@ export function PlayerPage() {
                 rowKey={(row) => String(row.game_id)}
               />
           </div>
+        ) : (
+          <div>No Gamelogs Found</div>
         )}
         
         {isLoading ? (
