@@ -90,7 +90,7 @@ export function PlayerPage() {
                       {label: 'Shots Blocked', key: 'shot_attempts_blocked'},
                       {label: 'Shots Missed', key: 'shot_attempts_missed'},
                       {label: 'Total Shot Att', key: 'shot_attempts_total'},
-                      {label: 'TOI', key: 'toi'},
+                      {label: 'TOI', key: 'toi', format: (value) => `${Math.floor(value / 60)}:${String(value % 60).padStart(2,'0')}`},
                       
                   ]}
 

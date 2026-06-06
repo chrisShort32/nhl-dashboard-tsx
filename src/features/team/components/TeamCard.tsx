@@ -16,9 +16,9 @@ export function TeamCard({
 
     const teamLogo = getTeamLogo(team_info.abbreviation, "light") // light or dark for logo
     //const record = team_info.team_wins + " - " + team_info.team_losses + " - " + team_info.team_otl
-    const base = "flex rounded-lg border bg-gray-300 items-center hover:bg-indigo-200"
+    const base = "flex rounded-lg border items-center hover:bg-gray-800"
     const variants = {
-        matchup: {container: "w-70 h-17", group: "flex", logo: "w-20 h-20", name: "font-bold mt-6"},
+        matchup: {container: "w-70 h-17 bg-gray-300", group: "flex", logo: "w-20 h-20", name: "font-bold mt-6"},
         bet: {container: "w-lg p-2", group: "flex-col mr-10", logo: "w-30 h-30", name: "font-bold text-lg"}
     }
     const v = variants[variant]
