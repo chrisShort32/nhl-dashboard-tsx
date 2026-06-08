@@ -13,10 +13,10 @@ export function PlayerSuggested({ suggestedBet }: PlayerSuggestedProps) {
         </p>
         <p>
           Line: {suggestedBet.threshold - 0.5} | Odds:{" "}
-          {suggestedBet.betOddsDecimal.toFixed(2)}
+          {suggestedBet.betOddsD.toFixed(2)}
         </p>
         <p>
-          Model Probabilty: {(suggestedBet.betProbability * 100).toFixed(2)}%
+          Model Probabilty: {(suggestedBet.betP * 100).toFixed(2)}%
         </p>
         <p>Edge: {(suggestedBet.betEdge * 100).toFixed(2)}%</p>
       </div>

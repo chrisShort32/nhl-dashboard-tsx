@@ -156,30 +156,32 @@ export type BetMetrics = {
   betType: "under" | "single" | "value" | "parlay"
   side: "over" | "under"
   threshold: number
-  betProbability: number
-  betImpliedProbability: number
-  betOddsDecimal: number
-  betOddsAmerican: number
+  betProbability?: number
+  betP: number
+  betImpliedProbability?: number
+  betImp?: number
+  betOddsDecimal?: number
+  betOddsD: number
+  betOddsAmerican?: number
+  betOdds?: number
   betEdge: number
 }
 
 // bet results - for betting analytics views
-export type BetResult = {
+export type BetResult = BetMetrics &{
   player: PlayerInfo
   team: TeamInfo
   opponent: TeamInfo
   betDate: string
-  betMetrics: BetMetrics
   actualSog: number
   hit: number
   profit: number
 }
 
-export type SuggestedBet = {
+export type SuggestedBet = BetMetrics &{
   player: PlayerInfo
   team: TeamInfo
   opponent: TeamInfo
-  betMetrics: BetMetrics
 }
 
 export type BetResultSummary<T> = {

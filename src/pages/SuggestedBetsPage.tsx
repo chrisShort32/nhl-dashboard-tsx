@@ -18,13 +18,14 @@ export function SuggestedBetsPage() {
     startDate: "2026-04-18",
     endDate: "2026-06-04",
   })
-
+  
   const playerById = new Map(suggestedBets?.map((p) => [p.player.id, p]))
 
   const playerBets = betSummaryPlayer?.flatMap((s) => {
     const player = playerById.get(Number(s.groupKey))
     return player ? [{ ...s, player }] : []
   })
+
   return (
     <div className="mx-auto max-w-8xl p-6">
       {isLoadingSuggested ? (
@@ -42,7 +43,7 @@ export function SuggestedBetsPage() {
                   teamInfo={players.player.team}
                 >
                   <PlayerSuggested
-                    suggestedBet={players.player.betMetrics}
+                    suggestedBet={players.player}
                   ></PlayerSuggested>
                   <BetSummary
                     summaryHorizon="Bet Results (Playoffs)"
