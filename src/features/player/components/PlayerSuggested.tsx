@@ -1,32 +1,17 @@
-type PlayerSuggestedProps = {
-    bet_type: string,
-    side: string,
-    threshold: number,
-    bet_odds_decimal: number,
-    bet_probability: number,
-    bet_implied_probability: number,
-    bet_edge: number
+import type { SuggestedBet } from "@/features/types"
 
+type PlayerSuggestedProps = {
+    suggestedBet: SuggestedBet
 }
-export function PlayerSuggested({ 
-    bet_type, 
-    side, 
-    threshold, 
-    bet_odds_decimal, 
-    bet_implied_probability, 
-    bet_probability, 
-    bet_edge 
-}: PlayerSuggestedProps) {
-    threshold -=0.5
+export function PlayerSuggested({ suggestedBet }: PlayerSuggestedProps) {
     return (
-        <div className="p-2 ml-10 rounded-lg">
+        <div className="p-2 ml-15 rounded-lg">
             <h2 className="text-lg font-bold">Suggested Bet</h2>
             <div className="space-y-1 text-sm">
-                <p>Bet Type: {bet_type} ({side})</p>
-                <p>Line: {threshold} | Odds: {(bet_odds_decimal).toFixed(2)}</p>
-                {/* <p>Implied Probability: {(bet_implied_probability * 100).toFixed(2)}%</p> */}
-                <p>Model Probabilty: {(bet_probability * 100).toFixed(2)}%</p>
-                <p>Edge: {(bet_edge * 100).toFixed(2)}%</p>
+                <p>Bet Type: {suggestedBet.betType} ({suggestedBet.side})</p>
+                <p>Line: {suggestedBet.threshold - 0.5} | Odds: {(suggestedBet.betOddsD).toFixed(2)}</p>
+                <p>Model Probabilty: {(suggestedBet.betP * 100).toFixed(2)}%</p>
+                <p>Edge: {(suggestedBet.betEdge * 100).toFixed(2)}%</p>
             </div>
         </div>
     )

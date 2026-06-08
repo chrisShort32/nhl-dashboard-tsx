@@ -26,20 +26,20 @@ export function PlayersHomePage() {
     })
 
 
-    const idsTop = betSummaryPlayerTop?.map(s => Number(s.group_key)) ?? []
-    const idsBottom = betSummaryPlayerBottom?.map(s => Number(s.group_key)) ?? []
+    const idsTop = betSummaryPlayerTop?.map(s => Number(s.groupKey)) ?? []
+    const idsBottom = betSummaryPlayerBottom?.map(s => Number(s.groupKey)) ?? []
     const ids = idsBottom.concat(idsTop)
     const players = usePlayerInfo(ids)
 
     const playerById = new Map(players.data?.map(p => [Number(p.id), p]))
 
     const topProfit = betSummaryPlayerTop?.flatMap(s => {
-        const player = playerById.get(Number(s.group_key))
+        const player = playerById.get(Number(s.groupKey))
         return player ? [{ ...s, player}] : []
     })
 
     const bottomProfit = betSummaryPlayerBottom?.flatMap(s => {
-        const player = playerById.get(Number(s.group_key))
+        const player = playerById.get(Number(s.groupKey))
         return player ? [{ ...s, player}] : []
     })
 
@@ -56,21 +56,15 @@ export function PlayersHomePage() {
                     <h1 className='text-3xl font-bold mt-10'>Top 12 - Profit (SLAM)</h1>
                     <div className="grid grid-cols-2 gap-5 mt-4 p-10 w-425">
                         {topProfit?.map((players) => (
-                            <div className="flex" key={players.group_key}>
+                            <div className="flex" key={players.groupKey}>
                                 <PlayerCard
-                                    player_id={players.player.id}
-                                    player_name={players.player.full_name}
-                                    headshot_url={players.player.headshot_url}
-                                    position={players.player.position}
-                                    sweater_number={players.player.sweater_number}
-                                    team_name={players.player.team_name}
-                                    team_abbreviation={players.player.team_abbreviation}
+                                    playerInfo={players.player}
                                 >
                                     <BetSummary
-                                        total_bets={players.n_bets}
-                                        hits={players.n_hits}
-                                        hit_rate={players.hit_rate}
-                                        profit={players.total_profit}
+                                        totalBets={players.nBets}
+                                        hits={players.nHits}
+                                        hitRate={players.hitRate}
+                                        profit={players.totalProfit}
                                     >
                                     </BetSummary>
                                     
@@ -92,21 +86,15 @@ export function PlayersHomePage() {
                     <h1 className='text-3xl font-bold mt-10'>Bottom 12 - Profit (FADE)</h1>
                     <div className="grid grid-cols-2 gap-5 mt-4 p-10 w-425">
                         {bottomProfit?.map((players) => (
-                            <div className="flex" key={players.group_key}>
+                            <div className="flex" key={players.groupKey}>
                                 <PlayerCard
-                                    player_id={players.player.id}
-                                    player_name={players.player.full_name}
-                                    headshot_url={players.player.headshot_url}
-                                    position={players.player.position}
-                                    sweater_number={players.player.sweater_number}
-                                    team_name={players.player.team_name}
-                                    team_abbreviation={players.player.team_abbreviation}
+                                    playerInfo={players.player}
                                 >
                                     <BetSummary
-                                        total_bets={players.n_bets}
-                                        hits={players.n_hits}
-                                        hit_rate={players.hit_rate}
-                                        profit={players.total_profit}
+                                        totalBets={players.nBets}
+                                        hits={players.nHits}
+                                        hitRate={players.hitRate}
+                                        profit={players.totalProfit}
                                     >
                                     </BetSummary>
                                     

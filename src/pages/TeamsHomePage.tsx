@@ -15,10 +15,9 @@ export function TeamsHomePage(){
   const teamById = new Map(teamInfo?.map(t => [t.id, t]))
 
   const teamBets = betSummaryTeam?.flatMap(s => {          
-    const team = teamById.get(Number(s.group_key))
+    const team = teamById.get(Number(s.groupKey))
     return team ? [{ ...s, team}] : []
   })
-    console.log(betSummaryTeam)
     return (
         <div className="mx-auto max-w-8xl p-6">
             {isLoadingSummary ? (
@@ -31,17 +30,17 @@ export function TeamsHomePage(){
                 <div className="grid grid-cols-2 gap-5 mt-4 p-10 w-290">
                     {teamBets.map((teams) => (
                         
-                        <div className="flex" key={teams.group_key}>
+                        <div className="flex" key={teams.groupKey}>
                             <TeamCard
-                                team_info={teams.team}
+                                teamInfo={teams.team}
                                 variant={"bet"}
                             >
                                 <BetSummary
-                                    summary_horizon='Bet Results (Playoffs)'
-                                    total_bets={teams.n_bets}
-                                    hits={teams.n_hits}
-                                    hit_rate={teams.hit_rate}
-                                    profit={teams.total_profit}
+                                    summaryHorizon='Bet Results (Playoffs)'
+                                    totalBets={teams.nBets}
+                                    hits={teams.nHits}
+                                    hitRate={teams.hitRate}
+                                    profit={teams.totalProfit}
                                 >
                                 </BetSummary>
                             </TeamCard>

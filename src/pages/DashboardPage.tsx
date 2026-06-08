@@ -28,13 +28,12 @@ export function DashboardPage() {
   const playerById = new Map(playerInfo?.map(p => [p.id, p]))
 
   const playerBets = betSummaryPlayer?.flatMap(s => {          
-    const player = playerById.get(s.group_key)
+    const player = playerById.get(s.groupKey)
     return player ? [{ ...s, player}] : []
   })
 
   const { data: matchupInfo, isLoading: isLoadingMatchup, isError: isErrorMatchup } = useMatchups()
-
-
+  
   return (
     <div className="mx-auto max-w-8xl p-6">
         <h1 className="text-5xl font-bold text-center">NHL Dashboard</h1>
@@ -62,26 +61,19 @@ export function DashboardPage() {
             <div>
                 <h1 className='text-3xl font-bold mt-10'>Testing</h1>
                 <div className="grid grid-cols-1 gap-5 mt-4 p-10 w-425">
-                    {playerBets.map((players, index) => (
+                    {playerBets.map((players) => (
                         
-                        <div className="flex" key={index}>
+                        <div className="flex" key={players.groupKey}>
                             <PlayerCard
-                                player_id={players.player.id}
-                                player_name={players.player.full_name}
-                                headshot_url={players.player.headshot_url}
-                                position={players.player.position}
-                                sweater_number={players.player.sweater_number}
-                                team_abbreviation={players.player.team_abbreviation}
-                                team_name={players.player.team_name}
+                                playerInfo={players.player}
                             >
                                 <BetSummary
-                                    total_bets={players.n_bets}
-                                    hits={players.n_hits}
-                                    hit_rate={players.hit_rate}
-                                    profit={players.total_profit}
-                                >
-
-                                </BetSummary>
+                                  totalBets={players.nBets}
+                                  hits={players.nHits}
+                                  hitRate={players.hitRate}
+                                  profit={players.totalProfit}
+                              >
+                              </BetSummary>
                 
                             </PlayerCard>
                         </div>
@@ -103,15 +95,15 @@ export function DashboardPage() {
             header="Bet Results By Player"
             data={betSummaryPlayer}
             columns= {[
-              {label: 'Player', key: 'group_label'},
-              {label: 'Total Bets', key: 'n_bets'},
-              {label: 'Hits', key: 'n_hits'},
-              {label: 'Hit Rate', key: 'hit_rate', format: (value) => `${(value * 100).toFixed(1)}%`},
-              {label: 'Profit', key: 'total_profit', format: (value) => `$${(value).toFixed(2)}`},
+              {label: 'Player', key: 'groupLabel'},
+              {label: 'Total Bets', key: 'nBets'},
+              {label: 'Hits', key: 'nHits'},
+              {label: 'Hit Rate', key: 'hitRate', format: (value) => `${(value * 100).toFixed(1)}%`},
+              {label: 'Profit', key: 'totalProfit', format: (value) => `$${(value).toFixed(2)}`},
 
             ]}
-            rowKey={(row) => String(row.group_key)}
-            rowClassName={(row) => (row.group_key.toString() === 'Total' ? 'font-bold' : '')}
+            rowKey={(row) => String(row.groupKey)}
+            rowClassName={(row) => (row.groupKey.toString() === 'Total' ? 'font-bold' : '')}
           />
     </div>
       ) : (

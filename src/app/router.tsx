@@ -6,6 +6,7 @@ import { ResultsPage } from '@/pages/ResultsPage'
 import { SuggestedBetsPage } from '@/pages/SuggestedBetsPage'
 import { AppShell } from '@/components/layout/AppShell'
 import { PlayersHomePage } from '@/pages/PlayersHomePage'
+import { TeamPage } from '@/pages/TeamPage'
 
 
 // Route table for the SPA. Expand here as new pages are added.
@@ -41,6 +42,10 @@ export const router = createBrowserRouter([
             {
                 path:'teams',
                 element: <TeamsHomePage />
+            },
+            {
+                path: 'team/:teamId',
+                element: <TeamPage />
             }
         ]
     }

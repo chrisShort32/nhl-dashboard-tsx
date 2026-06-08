@@ -3,18 +3,18 @@ import { getTeamLogo } from "@/features/teamLogos";
 import { Link } from "react-router-dom";
 
 type TeamCardProps = {
-    team_info: TeamInfo
+    teamInfo: TeamInfo
     variant?: 'bet' | 'matchup'
     children?: React.ReactNode
 }
 
 export function TeamCard({
-    team_info,
+    teamInfo,
     variant = 'matchup',
     children,
 }: TeamCardProps) {
 
-    const teamLogo = getTeamLogo(team_info.abbreviation, "light") // light or dark for logo
+    const teamLogo = getTeamLogo(teamInfo.abbreviation, "light") // light or dark for logo
     //const record = team_info.team_wins + " - " + team_info.team_losses + " - " + team_info.team_otl
     const base = "flex rounded-lg border items-center hover:bg-gray-800"
     const variants = {
@@ -24,15 +24,15 @@ export function TeamCard({
     const v = variants[variant]
 
     return (
-        <Link to={`/team/${team_info.abbreviation}`}>
+        <Link to={`/team/${teamInfo.id}`}>
             <div className={`${base} ${v.container}`}>
                 <div className={v.group}>
                     <img
                         src={teamLogo}
-                        alt={`${team_info.full_name} logo`}
+                        alt={`${teamInfo.fullName} logo`}
                         className={v.logo}
                     />
-                    <h2 className={v.name}>{team_info.full_name}</h2>
+                    <h2 className={v.name}>{teamInfo.fullName}</h2>
                 </div>
                 {children}
             </div>

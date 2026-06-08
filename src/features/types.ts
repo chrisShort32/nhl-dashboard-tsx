@@ -1,96 +1,129 @@
-// Core identifiers - used everywhere, always fetch these
-export type PlayerGameIdentifiers = {
-  season: string
-  game_id: string
-  game_date: string
-  player_id: string
-  team_id: string
-}
+/************* 
+  Player Types
+**************/
 
 // Player identity - for displaying player cards, rosters, etc.
-export type PlayerIdentity = {
+export type PlayerInfo = {
   id: string
-  full_name: string
-  first_name: string
-  last_name: string
-  position: string
-  sweater_number: number
-  headshot_url: string
-  team_name: string
-  team_abbreviation: string
-  team_logo_light: string
-  team_logo_dark: string
+  fullName: string
+  firstName?: string
+  lastName?: string
+  position?: string
+  sweaterNumber?: number
+  headshotUrl?: string
+  teamName: string
+  teamAbbreviation: string
+  teamLogoLight?: string
+  teamLogoDark?: string
 }
 
-// Basic box score stats - most common display needs
-export type PlayerBoxScore = {
-  shots_on_goal: number
-  blocked_shots: number
+// Game stats for a player
+export type PlayerGamelog = {
+  game: GameInfo
+  team: TeamInfo
+  opponent: TeamInfo
+  player: PlayerInfo
+  shotsOnGoal: number
+  shotAttemptsTotal: number
+  shotAttemptsBlocked: number
+  shotAttemptsMissed: number
+  ppShots: number
+  ppShotsBlocked: number
+  ppShotsMissed: number
+  ppAttemptsTotal: number
+  pkShots: number
+  pkShotsBlocked: number
+  pkShotsMissed: number
+  pkAttemptsTotal: number
+  blocks: number
   goals: number
   assists: number
   points: number
-  plus_minus: number
-  power_play_goals: number
+  plusMinus: number
+  ppGoals: number
   hits: number
-  hits_taken: number
+  hitsTaken: number
   pim: number
   toi: string
   shifts: number
   giveaways: number
   takeaways: number
-  on_pp: number
-  on_pk: number;  
+  onPp: number
+  onPk: number
+  isHome?: boolean  
 }
 
-// Advanced shot metrics - for detailed analytics views
-export type PlayerShotMetrics = {
-  shot_attempts_total: number
-  shot_attempts_blocked: number
-  shot_attempts_missed: number
-  pp_shots: number
-  pp_shots_blocked: number
-  pp_shots_missed: number
-  pp_attempts_total: number
-  pk_shots: number
-  pk_shots_blocked: number
-  pk_shots_missed: number
-  pk_attempts_total: number
+/************* 
+  Team Types
+**************/
+
+// Team information
+export type TeamInfo = {
+  id: number
+  abbreviation: string
+  fullName: string
+  logoLight?: string
+  logoDark?: string
+  wins?: number
+  losses?: number
+  otl?: number
 }
 
-// Game context - for game summaries, matchup info
-export type GameContext = {
-  opponent_id: string
-  opponent: string
-  opponent_logo: string
+// Team level game logs
+export type TeamGamelog = {
+  team: TeamInfo
+  opponent: TeamInfo
+  game: GameInfo
   is_home: boolean
-  is_playoffs: boolean
-  team_shots: number
-  team_goals: number
-  team_shots_against: number
-  team_goals_against: number
-  team_win: boolean
-  team_otl: boolean
-  team_loss: boolean
-  opponent_win: boolean
-  opponent_otl: boolean
-  opponent_loss: boolean
-  venue_location: string
-  venue: string
-  start_time_UTC: string
+  shotsOnGoal: number
+  shotAttemptsTotal: number
+  shotAttemptsBlocked: number
+  shotAttemptsMissed: number
+  shotsAgainst: number
+  shotAttemptsAgainst: number
+  goals: number
+  goalsAgainst: number
+  blocks: number
+  pim: number
+  win?: boolean
+  loss?: boolean
+  otl?: boolean
 }
 
+/************* 
+  Game Types
+**************/
+
+export type GameInfo = {
+  id: number
+  season: number
+  gameDate: string
+  homeTeam: TeamInfo
+  awayTeam: TeamInfo
+  startTime?: string
+  venue?: string
+  venueLocation?: string
+  isPlayoffs?: boolean
+}
+/**************** 
+  API Parameters
+*****************/
+
+// Gamelog base
 export type GamelogParams = {
-  playerId: string,  
   startDate?: string,
   endDate?: string,
   season?: string,
   playoffs?: string,
 }
-// Composed for full game log
-export type PlayerGameLog = PlayerGameIdentifiers &
-                            PlayerBoxScore &
-                            PlayerShotMetrics &
-                            GameContext
+
+export type PlayerGamelogParams = GamelogParams &{
+  playerId: string,  
+}
+
+export type TeamGamelogParams = GamelogParams &{
+  teamId: string
+}
 
 export type BetResultParams = {
   startDate?: string,
@@ -101,86 +134,75 @@ export type BetResultParams = {
   side?: 'over' | 'under',
   threshold?: '2' | '3' | '4' | '5'
 }
+
+export type SummaryParams = {
+  pivot: 'threshold' | 'side' | 'bet_type' | 'player' | 'team',
+  startDate?: string,
+  endDate?: string,
+  teamId?: string,
+  playerId?: string,
+  betType?: 'parlay' | 'value' | 'single' | 'under',
+  side?: 'over' | 'under',
+  threshold?: '2' | '3' | '4' | '5',
+  limit?: string,
+  orderBy?: 'asc' | 'desc'
+}
+
+
+/************* 
+  Bet Types
+**************/
+
 // bet results - for betting analytics views
-export type BetResult =  PlayerGameIdentifiers &{
-  bet_date: string
-  player_id: number
-  full_name: string
-  team_abbrev: string
-  opp_abbrev: string
-  is_home: boolean
-  actual_sog: number
-  bet_type: 'under' | 'single' | 'value' | 'parlay'
+export type BetResult =  PlayerInfo &{
+  betDate: string
+  playerId: number
+  fullName: string
+  teamAbbrev: string
+  oppAbbrev: string
+  isHome: boolean
+  actualSog: number
+  betType: 'under' | 'single' | 'value' | 'parlay'
   side: 'over' | 'under'
   threshold: number 
-  bet_probability: number
-  bet_implied_probability: number
-  bet_odds_decimal: number
-  bet_odds_american: number
-  bet_edge: number
+  betProbability: number
+  betImpliedProbability: number
+  betOddsDecimal: number
+  betOddsAmerican: number
+  betEdge: number
   hit: number
   profit: number
 }
 
+
 export type SuggestedBet = {
-  player: PlayerIdentity
+  player: PlayerInfo
   team: TeamInfo
-  opp_abbrev: string
-  is_home: boolean
+  oppAbbrev: string
+  isHome: boolean
   side: 'over' | 'under'
-  bet_type: 'under' | 'single' | 'value' | 'parlay'
+  betType: 'under' | 'single' | 'value' | 'parlay'
   threshold: number
-  bet_p: number
-  bet_imp: number
-  bet_odds: number
-  bet_odds_d: number
-  bet_edge: number
+  betP: number
+  betImp: number
+  betOdds: number
+  betOddsD: number
+  betEdge: number
 
-}
-
-export type SummaryParams = {
-    pivot: 'threshold' | 'side' | 'bet_type' | 'player' | 'team',
-    startDate?: string,
-    endDate?: string,
-    teamId?: string,
-    playerId?: string,
-    betType?: 'parlay' | 'value' | 'single' | 'under',
-    side?: 'over' | 'under',
-    threshold?: '2' | '3' | '4' | '5',
-    limit?: string,
-    orderBy?: 'asc' | 'desc'
 }
 
 export type BetResultSummary<T> = {
-  group_key: T // whatever we group by - bet type, team, player, etc
-  group_label: string
-  n_bets: number
-  n_hits: number
-  hit_rate: number
-  total_profit: number
+  groupKey: T // whatever we group by - bet type, team, player, etc
+  groupLabel: string
+  nBets: number
+  nHits: number
+  hitRate: number
+  totalProfit: number
 }
 
-export type TeamInfo = {
-  id: number
-  abbreviation: string
-  full_name: string
-  team_logo: string
-  team_logo_dark: string
-  team_wins: number
-  team_losses: number
-  team_otl: number
-}
-
-export type MatchupInfo = {
-  game_id: number
-  home_team: TeamInfo
-  away_team: TeamInfo
-  venue: string
-  start_time: string
-  game_date: string
-
-}
-
+/************* 
+  Unused??
+**************/
 export type FilterState = {
   dateRange: 0 | 6 | 30 | 90 | 'playoffs' | 'all'
   typeFilter: 'over' | 'single' | 'value' | 'parlay' | 'under' | 'all'

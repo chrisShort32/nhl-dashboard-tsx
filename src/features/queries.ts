@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import type { SummaryParams, BetResultParams, GamelogParams } from '@/features/types'
+import type { SummaryParams, BetResultParams, PlayerGamelogParams, TeamGamelogParams } from '@/features/types'
 import { 
     fetchBetResults, 
     fetchSuggestedBets, 
@@ -8,7 +8,8 @@ import {
     fetchTopPlayers, 
     fetchPlayerInfo, 
     fetchResultSummary, 
-    fetchTeamInfo 
+    fetchTeamInfo, 
+    fetchTeamGamelogs
 } from './api'
 
 // Query hook for the bet results for the last X games (default to 7)
@@ -60,10 +61,17 @@ export function useTeamInfo() {
 }
 
 // Query hook for player gamelogs
-export function useGamelog(params: GamelogParams) {
+export function useGamelog(params: PlayerGamelogParams) {
     return useQuery({
         queryKey: ['player', 'gamelog', params],
         queryFn: () => fetchPlayerGamelog(params),
+    })
+}
+
+export function useTeamGamelog(params: TeamGamelogParams) {
+    return useQuery({
+        queryKey: ['team', 'gamelog', params],
+        queryFn: () => fetchTeamGamelogs(params),
     })
 }
 

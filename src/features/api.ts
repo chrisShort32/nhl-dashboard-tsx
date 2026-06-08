@@ -1,25 +1,27 @@
 import { api } from '@/lib/api'
 import type { 
-    PlayerGameLog, 
     SuggestedBet, 
     BetResult, 
-    MatchupInfo, 
-    PlayerIdentity, 
+    GameInfo, 
+    PlayerInfo, 
     BetResultSummary, 
     SummaryParams, 
     BetResultParams,
-    GamelogParams,
-    TeamInfo
+    PlayerGamelog, 
+    PlayerGamelogParams,
+    TeamInfo,
+    TeamGamelog,
+    TeamGamelogParams,
 
 } from './types'
 
 // Fetches the latest game row for a single player from the backend.
-export async function fetchMatchups(): Promise<MatchupInfo[]> {
-    return api.get<MatchupInfo[]>('/games/today')
+export async function fetchMatchups(): Promise<GameInfo[]> {
+    return api.get<GameInfo[]>('/games/today')
 }
 
 // Fetches the full gamelog for a single player from the backend.
-export async function fetchPlayerGamelog(params: GamelogParams): Promise<PlayerGameLog[]> {
+export async function fetchPlayerGamelog(params: PlayerGamelogParams): Promise<PlayerGamelog[]> {
     const qs = new URLSearchParams()
 
     if (params.startDate) qs.set('start_date', params.startDate)
@@ -27,12 +29,7 @@ export async function fetchPlayerGamelog(params: GamelogParams): Promise<PlayerG
     if (params.season) qs.set('season', params.season)
     if (params.playoffs) qs.set('playoffs', params.playoffs)
     
-    return api.get<PlayerGameLog[]>(`/players/${params.playerId}/gamelogs?${qs}`)
-}
-
-// Fetches the full gamelogs of the top 10 players
-export async function fetchTopPlayers(filter: 'regSeason' | 'playoffs'): Promise<PlayerGameLog[][]> {
-    return api.get<PlayerGameLog[][]>(`/top-players?filter=${filter}`)
+    return api.get<PlayerGamelog[]>(`/players/${params.playerId}/gamelogs?${qs}`)
 }
 
 // Fetches bet results for the given date range (default is all)
@@ -77,11 +74,26 @@ export async function fetchSuggestedBets(): Promise<SuggestedBet[]> {
 }
 
 // Fetches player info for all players with a betting history
-export async function fetchPlayerInfo(players: number[]): Promise<PlayerIdentity[]> {
-    return api.post<PlayerIdentity[]>('/players', players)
+export async function fetchPlayerInfo(players: number[]): Promise<PlayerInfo[]> {
+    return api.post<PlayerInfo[]>('/players', players)
 }
 
 // Fetches team information for all teams in the league
 export async function fetchTeamInfo(): Promise<TeamInfo[]> {
     return api.get<TeamInfo[]>('/teams/info')
+}
+
+// Fetches team gamelogs for the specified team
+export async function fetchTeamGamelogs(params: TeamGamelogParams): Promise<TeamGamelog[]> {
+    return api.get<TeamGamelog[]>(`/teams/${params.teamId}/gamelogs`)
+}
+
+//********************************** */
+// Need to redo the following fetches:
+//********************************** */
+
+
+// Fetches the full gamelogs of the top 10 players
+export async function fetchTopPlayers(filter: 'regSeason' | 'playoffs'): Promise<PlayerGamelog[][]> {
+    return api.get<PlayerGamelog[][]>(`/top-players?filter=${filter}`)
 }

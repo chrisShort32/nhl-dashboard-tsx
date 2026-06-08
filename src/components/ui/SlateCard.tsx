@@ -1,8 +1,8 @@
 import { MatchupCard } from "./MatchupCard";
-import type { MatchupInfo} from "@/features/types";
+import type { GameInfo} from "@/features/types";
 
 type SlateCardProps = {
-    slate: MatchupInfo[]
+    slate: GameInfo[]
 }
 
 export function SlateCard({
@@ -21,7 +21,7 @@ export function SlateCard({
             <h1 className="text-3xl font-bold mt-6">Today's Slate</h1>
             <div className="grid grid-cols-2 mt-4 w-340">
                 {slate.map((matchup) => (
-                    <MatchupCard key={matchup.venue} matchup_info={matchup} />
+                    <MatchupCard key={matchup.venue} gameInfo={matchup} />
                 ))}
             </div>
         </div>

@@ -14,11 +14,9 @@ export function SuggestedBetsPage() {
     const playerById = new Map(suggestedBets?.map(p => [p.player.id, p]))
 
     const playerBets = betSummaryPlayer?.flatMap(s => {          
-        const player = playerById.get(s.group_key)
+        const player = playerById.get(s.groupKey)
         return player ? [{ ...s, player}] : []
     })
-
-    console.log(playerBets)
     return (
         <div className="mx-auto max-w-8xl p-6">
             {isLoadingSuggested ? (
@@ -31,33 +29,21 @@ export function SuggestedBetsPage() {
                 <div className="grid grid-cols-1 gap-5 mt-4 p-10 w-425">
                     {playerBets.map((players) => (
                         
-                        <div className="flex" key={players.group_key}>
+                        <div className="flex" key={players.groupKey}>
                             <PlayerCard
-                                player_id={players.player.player.id}
-                                player_name={players.player.player.full_name}
-                                headshot_url={players.player.player.headshot_url}
-                                position={players.player.player.position}
-                                sweater_number={players.player.player.sweater_number}
-                                team_abbreviation={players.player.team.abbreviation}
-                                team_name={players.player.team.full_name}
+                                playerInfo={players.player.player}
+                                teamInfo={players.player.team}
                             >
                                 <PlayerSuggested
-                                    bet_type={players.player.bet_type}
-                                    side={players.player.side}
-                                    threshold={players.player.threshold}
-                                    bet_odds_decimal={players.player.bet_odds_d}
-                                    bet_implied_probability={players.player.bet_imp}
-                                    bet_probability={players.player.bet_p}
-                                    bet_edge={players.player.bet_edge}
+                                    suggestedBet={players.player}
                                 >
                                 </PlayerSuggested>
-
                                 <BetSummary
-                                    summary_horizon='Bet Results (Playoffs)'
-                                    total_bets={players.n_bets}
-                                    hits={players.n_hits}
-                                    hit_rate={players.hit_rate}
-                                    profit={players.total_profit}
+                                    summaryHorizon='Bet Results (Playoffs)'
+                                    totalBets={players.nBets}
+                                    hits={players.nHits}
+                                    hitRate={players.hitRate}
+                                    profit={players.totalProfit}
                                 >
                                 </BetSummary>
 
