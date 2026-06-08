@@ -1,112 +1,109 @@
-import { useTopPlayers, useBetSummary, usePlayerInfo } from '@/features/queries'
-import { PlayerSnapshot } from '@/features/player/components/PlayerSnapshot'
-import { BetSummary } from '@/features/betting/BetSummary'
-import { PlayerCard } from '@/features/player/components/PlayerCard'
-import { Tabs } from '@/components/ui/Tabs'
-import { tabDateFilter } from '@/features/betting/utils'
-import { useMemo, useState } from 'react'
+import { useTopPlayers, useBetSummary, usePlayerInfo } from "@/features/queries"
+import { PlayerSnapshot } from "@/features/player/components/PlayerSnapshot"
+import { BetSummary } from "@/features/betting/BetSummary"
+import { PlayerCard } from "@/features/player/components/PlayerCard"
+import { Tabs } from "@/components/ui/Tabs"
+import { tabDateFilter } from "@/features/betting/utils"
+import { useMemo, useState } from "react"
 
 export function PlayersHomePage() {
+  const {
+    data: betSummaryPlayerTop,
+    isLoading: isLoadingSummaryTop,
+    isError: isErrorSummaryTop,
+  } = useBetSummary({
+    pivot: "player",
+    startDate: "2026-04-18",
+    endDate: "2026-06-04",
+    limit: "12",
+    orderBy: "desc",
+  })
 
-    
-    const { data: betSummaryPlayerTop, isLoading: isLoadingSummaryTop, isError: isErrorSummaryTop } = useBetSummary({
-      pivot: 'player',
-      startDate: '2026-04-18',
-      endDate: '2026-06-04',
-      limit: '12',
-      orderBy: 'desc',
-    })
-    
-    const { data: betSummaryPlayerBottom, isLoading: isLoadingSummaryBottom, isError: isErrorSummaryBottom } = useBetSummary({
-      pivot: 'player',
-      startDate: '2026-04-18',
-      endDate: '2026-06-04',
-      limit: '12',
-      orderBy: 'asc',
-    })
+  const {
+    data: betSummaryPlayerBottom,
+    isLoading: isLoadingSummaryBottom,
+    isError: isErrorSummaryBottom,
+  } = useBetSummary({
+    pivot: "player",
+    startDate: "2026-04-18",
+    endDate: "2026-06-04",
+    limit: "12",
+    orderBy: "asc",
+  })
 
+  const idsTop = betSummaryPlayerTop?.map((s) => Number(s.groupKey)) ?? []
+  const idsBottom = betSummaryPlayerBottom?.map((s) => Number(s.groupKey)) ?? []
+  const ids = idsBottom.concat(idsTop)
+  const players = usePlayerInfo(ids)
 
-    const idsTop = betSummaryPlayerTop?.map(s => Number(s.groupKey)) ?? []
-    const idsBottom = betSummaryPlayerBottom?.map(s => Number(s.groupKey)) ?? []
-    const ids = idsBottom.concat(idsTop)
-    const players = usePlayerInfo(ids)
+  const playerById = new Map(players.data?.map((p) => [Number(p.id), p]))
 
-    const playerById = new Map(players.data?.map(p => [Number(p.id), p]))
+  const topProfit = betSummaryPlayerTop?.flatMap((s) => {
+    const player = playerById.get(Number(s.groupKey))
+    return player ? [{ ...s, player }] : []
+  })
 
-    const topProfit = betSummaryPlayerTop?.flatMap(s => {
-        const player = playerById.get(Number(s.groupKey))
-        return player ? [{ ...s, player}] : []
-    })
+  const bottomProfit = betSummaryPlayerBottom?.flatMap((s) => {
+    const player = playerById.get(Number(s.groupKey))
+    return player ? [{ ...s, player }] : []
+  })
 
-    const bottomProfit = betSummaryPlayerBottom?.flatMap(s => {
-        const player = playerById.get(Number(s.groupKey))
-        return player ? [{ ...s, player}] : []
-    })
+  return (
+    <div className="mx-auto max-w-8xl p-6">
+      {isLoadingSummaryTop ? (
+        <div>Loading Data...</div>
+      ) : isErrorSummaryTop ? (
+        <div>Error fetching Data</div>
+      ) : topProfit ? (
+        <div>
+          <h1 className="text-3xl font-bold mt-10">Top 12 - Profit (SLAM)</h1>
+          <div className="grid grid-cols-2 gap-5 mt-4 p-10 w-425">
+            {topProfit?.map((players) => (
+              <div className="flex" key={players.groupKey}>
+                <PlayerCard playerInfo={players.player}>
+                  <BetSummary
+                    totalBets={players.nBets}
+                    hits={players.nHits}
+                    hitRate={players.hitRate}
+                    profit={players.totalProfit}
+                  ></BetSummary>
+                </PlayerCard>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div>No Data Found</div>
+      )}
 
-    
-    return (
-        <div className="mx-auto max-w-8xl p-6">
-            
-            {isLoadingSummaryTop ? (
-                <div>Loading Data...</div>
-            ) : isErrorSummaryTop ? (
-                <div>Error fetching Data</div>
-            ) : topProfit ? (
-                <div>
-                    <h1 className='text-3xl font-bold mt-10'>Top 12 - Profit (SLAM)</h1>
-                    <div className="grid grid-cols-2 gap-5 mt-4 p-10 w-425">
-                        {topProfit?.map((players) => (
-                            <div className="flex" key={players.groupKey}>
-                                <PlayerCard
-                                    playerInfo={players.player}
-                                >
-                                    <BetSummary
-                                        totalBets={players.nBets}
-                                        hits={players.nHits}
-                                        hitRate={players.hitRate}
-                                        profit={players.totalProfit}
-                                    >
-                                    </BetSummary>
-                                    
-                                </PlayerCard>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            ) : (
-                <div>No Data Found</div>
-            )}
-
-            {isLoadingSummaryBottom ? (
-                <div>Loading Data...</div>
-            ) : isErrorSummaryBottom ? (
-                <div>Error fetching Data</div>
-            ) : bottomProfit ? (
-                <div>
-                    <h1 className='text-3xl font-bold mt-10'>Bottom 12 - Profit (FADE)</h1>
-                    <div className="grid grid-cols-2 gap-5 mt-4 p-10 w-425">
-                        {bottomProfit?.map((players) => (
-                            <div className="flex" key={players.groupKey}>
-                                <PlayerCard
-                                    playerInfo={players.player}
-                                >
-                                    <BetSummary
-                                        totalBets={players.nBets}
-                                        hits={players.nHits}
-                                        hitRate={players.hitRate}
-                                        profit={players.totalProfit}
-                                    >
-                                    </BetSummary>
-                                    
-                                </PlayerCard>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            ) : (
-                <div>No Data Found</div>
-            )}
-            {/* {isLoadingSummary ? (
+      {isLoadingSummaryBottom ? (
+        <div>Loading Data...</div>
+      ) : isErrorSummaryBottom ? (
+        <div>Error fetching Data</div>
+      ) : bottomProfit ? (
+        <div>
+          <h1 className="text-3xl font-bold mt-10">
+            Bottom 12 - Profit (FADE)
+          </h1>
+          <div className="grid grid-cols-2 gap-5 mt-4 p-10 w-425">
+            {bottomProfit?.map((players) => (
+              <div className="flex" key={players.groupKey}>
+                <PlayerCard playerInfo={players.player}>
+                  <BetSummary
+                    totalBets={players.nBets}
+                    hits={players.nHits}
+                    hitRate={players.hitRate}
+                    profit={players.totalProfit}
+                  ></BetSummary>
+                </PlayerCard>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div>No Data Found</div>
+      )}
+      {/* {isLoadingSummary ? (
                 <div>Loading Data...</div>
             ) : isErrorSummary ? (
                 <div>Error fetching Data</div>
@@ -215,6 +212,6 @@ export function PlayersHomePage() {
             ) : (
                 <div>No Data Found</div>
             )} */}
-        </div>  
-    )
+    </div>
+  )
 }

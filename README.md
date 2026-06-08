@@ -13,12 +13,15 @@ React · TypeScript · Vite · Tailwind CSS · TanStack Query · Recharts · Rea
 ## Features
 
 ### Today's Slate
+
 Displays the current day's NHL matchups with team records, logos, venue, and game time. Each matchup links to a detailed team page.
 
 ### Suggested Bets
+
 Surfaces model-generated SOG prop picks for the day's slate, including predicted probability, implied odds, decimal odds, edge, and rolling player averages at multiple horizons (5-game, 10-game, season).
 
 ### Bet Results
+
 Fetches the last 30 days of bet outcomes on load and filters entirely client-side. Includes:
 
 - **Tab-based quick filters** — Yesterday, Last Week, Last Month, All Time
@@ -27,12 +30,15 @@ Fetches the last 30 days of bet outcomes on load and filters entirely client-sid
 - **Cumulative profit chart** — Daily P&L over the filtered window
 
 ### Calibration Analysis
+
 Bucket-based calibration views comparing predicted probability (or edge) against actual hit rate and profit. Supports configurable bucket widths and max-bucket capping. The diagonal reference line on the probability vs. hit-rate chart shows perfect calibration at a glance.
 
 ### Player Pages
+
 Linked from any player reference in the app. Displays a player card (headshot, number, position, team logo) alongside a stat snapshot (goals, assists, points, SOG, shot attempts — totals and per-game) computed from the player's game log.
 
 ### Team Pages
+
 Linked from matchup cards and team references. Shows team record and logo with a roster-level view.
 
 ---
@@ -108,10 +114,12 @@ Linked from matchup cards and team references. Shows team record and logo with a
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js (v18+)
 - The Flask API running locally or on a remote host (see [Related Repositories](#related-repositories))
 
 ### Install & Run
+
 ```bash
 npm install
 npm run dev
@@ -131,10 +139,10 @@ For full details, see the backend and ML pipeline repos.
 
 ## Related Repositories
 
-| Repo | Description |
-|------|-------------|
-| **NHL API / Backend** | Flask API serving parquet data, slate info, and ML-generated suggestions |
-| **NHL ML Pipeline** | LightGBM training, feature engineering, isotonic calibration, and slate injection |
+| Repo                  | Description                                                                       |
+| --------------------- | --------------------------------------------------------------------------------- |
+| **NHL API / Backend** | Flask API serving parquet data, slate info, and ML-generated suggestions          |
+| **NHL ML Pipeline**   | LightGBM training, feature engineering, isotonic calibration, and slate injection |
 
 > Replace the repo names above with links once they're public.
 

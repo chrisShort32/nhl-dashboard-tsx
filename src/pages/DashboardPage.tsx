@@ -1,90 +1,93 @@
-import { useBetResults, useSuggestedBets, useMatchups, usePlayerInfo, useBetSummary } from '@/features/queries'
-import { tabDateFilter } from '@/features/betting/utils'
-import { Tabs } from '@/components/ui/Tabs'
-import { useState } from 'react'
-import { DataTable } from '@/components/ui/DataTable'
-import { SlateCard } from '@/components/ui/SlateCard'
-import { PlayerCard } from '@/features/player/components/PlayerCard'
-import { BetSummary } from '@/features/betting/BetSummary'
-
-
+import {
+  useBetResults,
+  useSuggestedBets,
+  useMatchups,
+  usePlayerInfo,
+  useBetSummary,
+} from "@/features/queries"
+import { tabDateFilter } from "@/features/betting/utils"
+import { Tabs } from "@/components/ui/Tabs"
+import { useState } from "react"
+import { DataTable } from "@/components/ui/DataTable"
+import { SlateCard } from "@/components/ui/SlateCard"
+import { PlayerCard } from "@/features/player/components/PlayerCard"
+import { BetSummary } from "@/features/betting/BetSummary"
 
 export function DashboardPage() {
+  const {
+    data: playerInfo,
+    isLoading: isLoadingInfo,
+    isError: isErrorInfo,
+  } = usePlayerInfo([
+    8480069, 8481540, 8484984, 8480336, 8480018, 8473533, 8482702,
+  ])
 
-  const { 
-    data: playerInfo, 
-    isLoading: isLoadingInfo, 
-    isError: isErrorInfo 
-  } = usePlayerInfo([8480069, 8481540, 8484984, 8480336, 8480018, 8473533, 8482702])
-  
-  
-  const { data: betSummaryPlayer, isLoading: isLoadingSummary, isError: isErrorSummary } = useBetSummary({
-    pivot: 'player',
-    startDate: '2026-04-18',
-    endDate: '2026-06-04',
-
+  const {
+    data: betSummaryPlayer,
+    isLoading: isLoadingSummary,
+    isError: isErrorSummary,
+  } = useBetSummary({
+    pivot: "player",
+    startDate: "2026-04-18",
+    endDate: "2026-06-04",
   })
 
-  const playerById = new Map(playerInfo?.map(p => [p.id, p]))
+  const playerById = new Map(playerInfo?.map((p) => [p.id, p]))
 
-  const playerBets = betSummaryPlayer?.flatMap(s => {          
-    const player = playerById.get(s.groupKey)
-    return player ? [{ ...s, player}] : []
+  const playerBets = betSummaryPlayer?.flatMap((s) => {
+    const player = playerById.get(Number(s.groupKey))
+    return player ? [{ ...s, player }] : []
   })
 
-  const { data: matchupInfo, isLoading: isLoadingMatchup, isError: isErrorMatchup } = useMatchups()
-  
+  const {
+    data: matchupInfo,
+    isLoading: isLoadingMatchup,
+    isError: isErrorMatchup,
+  } = useMatchups()
+
   return (
     <div className="mx-auto max-w-8xl p-6">
-        <h1 className="text-5xl font-bold text-center">NHL Dashboard</h1>
+      <h1 className="text-5xl font-bold text-center">NHL Dashboard</h1>
       {isLoadingMatchup ? (
         <div>Loading Matchup...</div>
       ) : isErrorMatchup ? (
         <div>No Matchups Found</div>
       ) : matchupInfo ? (
         <div>
-          <SlateCard
-            slate={matchupInfo}
-          />
+          <SlateCard slate={matchupInfo} />
         </div>
       ) : (
         <div>No Matchups Found</div>
       )}
-      <div>
-      </div>
-        
-        {isLoadingInfo ? (
-            <div>Loading Data...</div>
-        ) : isErrorInfo ? (
-            <div>Error fetching Data</div>
-        ) : playerBets && playerBets.length > 0 ? (
-            <div>
-                <h1 className='text-3xl font-bold mt-10'>Testing</h1>
-                <div className="grid grid-cols-1 gap-5 mt-4 p-10 w-425">
-                    {playerBets.map((players) => (
-                        
-                        <div className="flex" key={players.groupKey}>
-                            <PlayerCard
-                                playerInfo={players.player}
-                            >
-                                <BetSummary
-                                  totalBets={players.nBets}
-                                  hits={players.nHits}
-                                  hitRate={players.hitRate}
-                                  profit={players.totalProfit}
-                              >
-                              </BetSummary>
-                
-                            </PlayerCard>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        ) : (
-            <div>No Data Found</div>
-        )}
+      <div></div>
 
-        {isLoadingSummary ? (
+      {isLoadingInfo ? (
+        <div>Loading Data...</div>
+      ) : isErrorInfo ? (
+        <div>Error fetching Data</div>
+      ) : playerBets && playerBets.length > 0 ? (
+        <div>
+          <h1 className="text-3xl font-bold mt-10">Testing</h1>
+          <div className="grid grid-cols-1 gap-5 mt-4 p-10 w-425">
+            {playerBets.map((players) => (
+              <div className="flex" key={players.groupKey}>
+                <PlayerCard playerInfo={players.player}>
+                  <BetSummary
+                    totalBets={players.nBets}
+                    hits={players.nHits}
+                    hitRate={players.hitRate}
+                    profit={players.totalProfit}
+                  ></BetSummary>
+                </PlayerCard>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div>No Data Found</div>
+      )}
+
+      {isLoadingSummary ? (
         <div>Loading Bet Results...</div>
       ) : isErrorSummary ? (
         <div>No Bet Results Found</div>
@@ -94,21 +97,30 @@ export function DashboardPage() {
             link="/results"
             header="Bet Results By Player"
             data={betSummaryPlayer}
-            columns= {[
-              {label: 'Player', key: 'groupLabel'},
-              {label: 'Total Bets', key: 'nBets'},
-              {label: 'Hits', key: 'nHits'},
-              {label: 'Hit Rate', key: 'hitRate', format: (value) => `${(value * 100).toFixed(1)}%`},
-              {label: 'Profit', key: 'totalProfit', format: (value) => `$${(value).toFixed(2)}`},
-
+            columns={[
+              { label: "Player", key: "groupLabel" },
+              { label: "Total Bets", key: "nBets" },
+              { label: "Hits", key: "nHits" },
+              {
+                label: "Hit Rate",
+                key: "hitRate",
+                format: (value) => `${(Number(value) * 100).toFixed(1)}%`,
+              },
+              {
+                label: "Profit",
+                key: "totalProfit",
+                format: (value) => `$${Number(value).toFixed(2)}`,
+              },
             ]}
             rowKey={(row) => String(row.groupKey)}
-            rowClassName={(row) => (row.groupKey.toString() === 'Total' ? 'font-bold' : '')}
+            rowClassName={(row) =>
+              row.groupKey.toString() === "Total" ? "font-bold" : ""
+            }
           />
-    </div>
+        </div>
       ) : (
         <div>No Bet Results Found</div>
       )}
-
-  </div>
-)}
+    </div>
+  )
+}

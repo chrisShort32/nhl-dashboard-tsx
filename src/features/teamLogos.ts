@@ -1,5 +1,9 @@
-export function getTeamLogo(teamCode: string, lightOrDark: "light" | "dark"): string {
-     const logoPath = lightOrDark === "dark" ? teamCode + "_dark.svg" : teamCode + ".svg"
+export function getTeamLogo(
+  teamCode: string,
+  lightOrDark: "light" | "dark",
+): string {
+  const logoPath =
+    lightOrDark === "dark" ? teamCode + "_dark.svg" : teamCode + ".svg"
 
-     return "/team_logos/" + logoPath
+  return "/team_logos/" + logoPath
 }

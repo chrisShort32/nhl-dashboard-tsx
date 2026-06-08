@@ -4,7 +4,7 @@
 
 // Player identity - for displaying player cards, rosters, etc.
 export type PlayerInfo = {
-  id: string
+  id: number
   fullName: string
   firstName?: string
   lastName?: string
@@ -50,7 +50,7 @@ export type PlayerGamelog = {
   takeaways: number
   onPp: number
   onPk: number
-  isHome?: boolean  
+  isHome?: boolean
 }
 
 /************* 
@@ -74,7 +74,7 @@ export type TeamGamelog = {
   team: TeamInfo
   opponent: TeamInfo
   game: GameInfo
-  is_home: boolean
+  isHome: boolean
   shotsOnGoal: number
   shotAttemptsTotal: number
   shotAttemptsBlocked: number
@@ -111,84 +111,75 @@ export type GameInfo = {
 
 // Gamelog base
 export type GamelogParams = {
-  startDate?: string,
-  endDate?: string,
-  season?: string,
-  playoffs?: string,
+  startDate?: string
+  endDate?: string
+  season?: string
+  playoffs?: string
 }
 
-export type PlayerGamelogParams = GamelogParams &{
-  playerId: string,  
+export type PlayerGamelogParams = GamelogParams & {
+  playerId: string
 }
 
-export type TeamGamelogParams = GamelogParams &{
+export type TeamGamelogParams = GamelogParams & {
   teamId: string
 }
 
 export type BetResultParams = {
-  startDate?: string,
-  endDate?: string,
-  teamId?: string,
-  playerId?: string,
-  betType?: 'parlay' | 'value' | 'single' | 'under',
-  side?: 'over' | 'under',
-  threshold?: '2' | '3' | '4' | '5'
+  startDate?: string
+  endDate?: string
+  teamId?: string
+  playerId?: string
+  betType?: "parlay" | "value" | "single" | "under"
+  side?: "over" | "under"
+  threshold?: "2" | "3" | "4" | "5"
 }
 
 export type SummaryParams = {
-  pivot: 'threshold' | 'side' | 'bet_type' | 'player' | 'team',
-  startDate?: string,
-  endDate?: string,
-  teamId?: string,
-  playerId?: string,
-  betType?: 'parlay' | 'value' | 'single' | 'under',
-  side?: 'over' | 'under',
-  threshold?: '2' | '3' | '4' | '5',
-  limit?: string,
-  orderBy?: 'asc' | 'desc'
+  pivot: "threshold" | "side" | "bet_type" | "player" | "team"
+  startDate?: string
+  endDate?: string
+  teamId?: string
+  playerId?: string
+  betType?: "parlay" | "value" | "single" | "under"
+  side?: "over" | "under"
+  threshold?: "2" | "3" | "4" | "5"
+  limit?: string
+  orderBy?: "asc" | "desc"
 }
-
 
 /************* 
   Bet Types
 **************/
-
-// bet results - for betting analytics views
-export type BetResult =  PlayerInfo &{
-  betDate: string
-  playerId: number
-  fullName: string
-  teamAbbrev: string
-  oppAbbrev: string
+export type BetMetrics = {
   isHome: boolean
-  actualSog: number
-  betType: 'under' | 'single' | 'value' | 'parlay'
-  side: 'over' | 'under'
-  threshold: number 
+  betType: "under" | "single" | "value" | "parlay"
+  side: "over" | "under"
+  threshold: number
   betProbability: number
   betImpliedProbability: number
   betOddsDecimal: number
   betOddsAmerican: number
   betEdge: number
+}
+
+// bet results - for betting analytics views
+export type BetResult = {
+  player: PlayerInfo
+  team: TeamInfo
+  opponent: TeamInfo
+  betDate: string
+  betMetrics: BetMetrics
+  actualSog: number
   hit: number
   profit: number
 }
 
-
 export type SuggestedBet = {
   player: PlayerInfo
   team: TeamInfo
-  oppAbbrev: string
-  isHome: boolean
-  side: 'over' | 'under'
-  betType: 'under' | 'single' | 'value' | 'parlay'
-  threshold: number
-  betP: number
-  betImp: number
-  betOdds: number
-  betOddsD: number
-  betEdge: number
-
+  opponent: TeamInfo
+  betMetrics: BetMetrics
 }
 
 export type BetResultSummary<T> = {
@@ -204,9 +195,9 @@ export type BetResultSummary<T> = {
   Unused??
 **************/
 export type FilterState = {
-  dateRange: 0 | 6 | 30 | 90 | 'playoffs' | 'all'
-  typeFilter: 'over' | 'single' | 'value' | 'parlay' | 'under' | 'all'
-  thresholdFilter: 2 | 3 | 4 | 5 | 6 | 'all' // 6 == 2 and 3 threshold combo
+  dateRange: 0 | 6 | 30 | 90 | "playoffs" | "all"
+  typeFilter: "over" | "single" | "value" | "parlay" | "under" | "all"
+  thresholdFilter: 2 | 3 | 4 | 5 | 6 | "all" // 6 == 2 and 3 threshold combo
 }
 
 export type CalibrationResult = {
@@ -216,6 +207,4 @@ export type CalibrationResult = {
   totalHits: number
   hitRate: number
   profit: number
-} 
-
-                      
+}
