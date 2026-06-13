@@ -136,7 +136,7 @@ export type BetResultParams = {
 }
 
 export type SummaryParams = {
-  pivot: "threshold" | "side" | "bet_type" | "player" | "team"
+  pivot: "threshold" | "side" | "bet_type" | "player" | "team" | "bet_date"
   startDate?: string
   endDate?: string
   teamId?: string
@@ -191,6 +191,12 @@ export type BetResultSummary<T> = {
   nHits: number
   hitRate: number
   totalProfit: number
+}
+
+export type CumulativeProfit = {
+  betDate: string
+  dailyProfit: number
+  cumulativeProfit: number
 }
 
 /************* 

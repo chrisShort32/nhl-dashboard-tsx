@@ -1,11 +1,9 @@
 import { useState } from "react"
 import type { FilterState } from "@/features/types"
-import { useBetResults } from "@/features/queries"
+import { useBetResults, useBetSummary, useCumulativeProfit } from "@/features/queries"
 import { DataTable } from "@/components/ui/DataTable"
 import {
-  applyFilters,
   calibration,
-  computeCumulativeProfit,
 } from "@/features/betting/utils"
 import {
   ResponsiveContainer,
@@ -55,14 +53,45 @@ export function ResultsPage() {
   //const todayString = today.toISOString().split('T')[0]
   //const filtered = betResults ? applyFilters(betResults, filter) : []
   const {
-    data: betResults,
-    isLoading,
-    isError,
-  } = useBetResults({
-    playerId: 8481540,
+    data: thresholdSummary,
+    isLoading: isLoadingThreshold,
+    isError: isErrorThreshold,
+  } = useBetSummary({
+    pivot: "threshold",
     startDate: "2026-04-18",
     endDate: "2026-05-29",
   })
+
+  const {
+    data: betTypeSummary,
+    isLoading: isLoadingBetType,
+    isError: isErrorBetType,
+  } = useBetSummary({
+    pivot: "bet_type",
+    startDate: "2026-04-18",
+    endDate: "2026-05-29",
+  })
+
+  const {
+    data: betDateSummary,
+    isLoading: isLoadingBetDate,
+    isError: isErrorBetDate,
+  } = useBetSummary({
+    pivot: "bet_date",
+    startDate: "2026-04-18",
+    endDate: "2026-05-29",
+  })
+
+  const {
+    data: cumulativeProfit,
+    isLoading: isLoadingProfit,
+    isError: isErrorProfit,
+  } = useCumulativeProfit(
+    "2026-05-16", // startDate
+    "2026-06-11" // endDate
+  )
+
+
 
   /* // calibration data
     const CALIBRATION_MAX = 0.70 // max bet_p for buckets
@@ -96,92 +125,18 @@ export function ResultsPage() {
  */
   return (
     <div className="mx-auto max-w-8xl p-6">
-      <div className="grid grid-cols-3 mt-5 p-10 w-125 items-center">
-        <div className="w-25">
-          <label>
-            Time Period
-            <select
-              className="w-30 mt-2 bg-indigo-500"
-              onChange={(e) => {
-                const raw = e.target.value
-                const parsed =
-                  raw === "all"
-                    ? "all"
-                    : raw === "playoffs"
-                      ? "playoffs"
-                      : Number(raw)
-                setFilter((prev) => ({
-                  ...prev,
-                  dateRange: parsed as FilterState["dateRange"],
-                }))
-              }}
-              value={filter.dateRange}
-            >
-              {DATE_RANGE_OPTIONS.map((item) => (
-                <option key={item.label} value={item.value}>
-                  {item.label}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-        <div className="w-25">
-          <label>
-            Bet Type
-            <select
-              className="w-30 mt-2 bg-indigo-500"
-              onChange={(e) => {
-                setFilter((prev) => ({
-                  ...prev,
-                  typeFilter: e.target.value as FilterState["typeFilter"],
-                }))
-              }}
-              value={filter.typeFilter}
-            >
-              {BET_TYPE_OPTIONS.map((item) => (
-                <option key={item.label} value={item.value}>
-                  {item.label}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-        <div className="w-25">
-          <label>
-            Bet Line
-            <select
-              className="w-30 mt-2 bg-indigo-500"
-              onChange={(e) => {
-                const raw = e.target.value
-                const parsed = raw === "all" ? "all" : Number(raw)
-                setFilter((prev) => ({
-                  ...prev,
-                  thresholdFilter: parsed as FilterState["thresholdFilter"],
-                }))
-              }}
-              value={filter.thresholdFilter}
-            >
-              {THRESHOLD_OPTIONS.map((item) => (
-                <option key={item.label} value={item.value}>
-                  {item.label}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-      </div>
-      {isLoading ? (
-        <div>Loading Data...</div>
-      ) : isError ? (
-        <div>Error fetching Data</div>
-      ) : chartData ? (
+      {isLoadingProfit? (
+        <div>Loading Cumulative Profit...</div>
+      ) : isErrorProfit ? (
+        <div>Error fetching profit data</div>
+      ) : cumulativeProfit && cumulativeProfit.length > 0? (
         <div className="ml-5">
           <h1 className="text-3xl font-bold p-5 m-5">Profit Over Time</h1>
           <ResponsiveContainer width="90%" height={500}>
-            <LineChart data={chartData} title={"Profit Over Time"}>
+            <LineChart data={cumulativeProfit} title={"Profit Over Time"}>
               <CartesianGrid strokeDasharray="5 5" />
               <XAxis
-                dataKey="game_date"
+                dataKey="betDate"
                 tick={{ fontSize: 12, fill: "#ffffff" }}
                 label={{
                   value: "Date",
@@ -208,16 +163,16 @@ export function ResultsPage() {
                 stroke="#ffffff"
               />
               <Tooltip
-                formatter={(value) => [value, "Cumulative Profit ($)"]}
+                formatter={(value) => [`$${(Number(value).toFixed(2))}`, "Cumulative Profit"]}
               />
 
               <Line
                 type="monotone"
-                dataKey="cum_profit"
+                dataKey="cumulativeProfit"
                 stroke="#6366f1"
                 dot={(props) => {
                   const { cx, cy, payload } = props
-                  const color = payload.cum_profit >= 0 ? "#0ffa26" : "#ef4444"
+                  const color = payload.cumulativeProfit >= 0 ? "#0ffa26" : "#ef4444"
                   return (
                     <circle
                       cx={cx}
@@ -236,176 +191,114 @@ export function ResultsPage() {
               />
             </LineChart>
           </ResponsiveContainer>
-          <DataTable
-            link="/results"
-            header="Bet Results By Threshold"
-            data={betSummaryThreshold}
-            columns={[
-              { label: "Threshold", key: "summary_pivot" },
-              { label: "Total Bets", key: "total_bets" },
-              { label: "Hits", key: "hits" },
-              {
-                label: "Hit Rate",
-                key: "hit_rate",
-                format: (value) => `${(value * 100).toFixed(1)}%`,
-              },
-              {
-                label: "Avg Odds",
-                key: "average_odds",
-                format: (value) => value.toFixed(2),
-              },
-              {
-                label: "Profit",
-                key: "profit",
-                format: (value) => `$${value.toFixed(2)}`,
-              },
-            ]}
-            rowKey={(row) => String(row.summary_pivot)}
-            rowClassName={(row) =>
-              row.summary_pivot.toString() === "Total" ? "font-bold" : ""
-            }
-          />
-          <DataTable
-            link="/results"
-            header="Bet Results By Bet Type"
-            data={betSummaryBetType}
-            columns={[
-              { label: "Bet Type", key: "summary_pivot" },
-              { label: "Total Bets", key: "total_bets" },
-              { label: "Hits", key: "hits" },
-              {
-                label: "Hit Rate",
-                key: "hit_rate",
-                format: (value) => `${(value * 100).toFixed(1)}%`,
-              },
-              {
-                label: "Avg Odds",
-                key: "average_odds",
-                format: (value) => value.toFixed(2),
-              },
-              {
-                label: "Profit",
-                key: "profit",
-                format: (value) => `$${value.toFixed(2)}`,
-              },
-            ]}
-            rowKey={(row) => String(row.summary_pivot)}
-            rowClassName={(row) =>
-              row.summary_pivot === "Total" ? "font-bold" : ""
-            }
-          />
-          <h1 className="text-3xl font-bold p-5 mt-10">
-            Breakdown By Threshold
-          </h1>
-          <div className="grid grid-cols-2 gap-4 w-250">
-            {[...chartsByThreshold.entries()].map(([threshold, data]) => {
-              const barData = data.map((row) => ({
-                threshold: threshold,
-                bet_type: row.bet_type,
-                total_hits: row.hits,
-                total_misses: row.total_bets - row.hits,
-                hit_rate: row.hit_rate,
-              }))
-
-              return (
-                <div key={threshold}>
-                  <h2 className="text-xl font-bold m-5">{`Bet Line Threshold ${threshold}`}</h2>
-                  <ResponsiveContainer height={400} width={400}>
-                    <BarChart
-                      title={`Bet Line Threshold ${threshold}`}
-                      barCategoryGap="10%"
-                      barGap={4}
-                      data={barData}
-                      id="BarChart-Stacked"
-                      layout="horizontal"
-                      stackOffset="none"
-                    >
-                      <CartesianGrid strokeDasharray={"3 3"} stroke="grey" />
-                      <XAxis
-                        dataKey={"bet_type"}
-                        label={{
-                          value: "Bet Type",
-                          position: "insideBottom",
-                          offset: 10,
-                          fill: "#ffffff",
-                        }}
-                        tick={{ fontSize: 12, fill: "#ffffff" }}
-                        height={60}
-                        stroke="#ffffff"
-                      />
-
-                      <YAxis
-                        domain={[0, maxBets + Math.ceil(maxBets * 0.15)]}
-                        tick={{ fontSize: 12, fill: "#ffffff" }}
-                        label={{
-                          value: "Total Bets",
-                          angle: -90,
-                          position: "insideLeft",
-                          fill: "#ffffff",
-                        }}
-                        height={60}
-                        stroke="#ffffff"
-                      />
-                      <Tooltip />
-                      <Legend />
-                      <Bar
-                        stackId="a"
-                        barSize={50}
-                        dataKey={"total_hits"}
-                        fill="#0ffa26"
-                        name="Hits"
-                      />
-                      <Bar
-                        stackId="a"
-                        barSize={50}
-                        dataKey={"total_misses"}
-                        fill="#ef4444"
-                        name="Misses"
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              )
-            })}
           </div>
-          <div className="m-5">
-            <h1 className="text-3xl font-bold p-5 m-5">Model Calibration</h1>
-
-            <AnalysisChart
-              data={calibrationBuckets}
-              maxBucket={CALIBRATION_MAX}
-              bucketWidth={CALIBRATION_BUCKET_WIDTH}
-              pivot="bet_p"
-              chartType="hitRate"
-            />
-            <AnalysisChart
-              data={calibrationBuckets}
-              maxBucket={CALIBRATION_MAX}
-              bucketWidth={CALIBRATION_BUCKET_WIDTH}
-              pivot="bet_p"
-              chartType="profit"
-            />
-
-            <h1 className="text-3xl font-bold p-5 m-5">Edge Analysis</h1>
-            <AnalysisChart
-              data={edgeBuckets}
-              maxBucket={EDGE_MAX}
-              bucketWidth={EDGE_BUCKET_WIDTH}
-              pivot="bet_edge"
-              chartType="hitRate"
-            />
-            <AnalysisChart
-              data={edgeBuckets}
-              maxBucket={EDGE_MAX}
-              bucketWidth={EDGE_BUCKET_WIDTH}
-              pivot="bet_edge"
-              chartType="profit"
-            />
-          </div>
-        </div>
-      ) : (
-        <div>No Data Found</div>
+        ) : (
+            <div>Summary not found</div>
       )}
+
+      {isLoadingThreshold ? (
+              <div>Loading Summary...</div>
+            ) : isErrorThreshold ? (
+              <div>Error fetching summary</div>
+            ) : thresholdSummary && thresholdSummary.length > 0 ? (
+              <div>
+                <DataTable
+                  link="/results"
+                  header="Bet Results By Threshold"
+                  data={thresholdSummary}
+                  columns={[
+                    { label: "Threshold", key: "groupLabel" },
+                    { label: "Total Bets", key: "nBets" },
+                    { label: "Hits", key: "nHits" },
+                    {
+                      label: "Hit Rate",
+                      key: "hitRate",
+                      format: (value) => `${(Number(value) * 100).toFixed(1)}%`,
+                    },
+                    {
+                      label: "Profit",
+                      key: "totalProfit",
+                      format: (value) => `$${Number(value).toFixed(2)}`,
+                    },
+                  ]}
+                  rowKey={(row) => String(row.groupKey)}
+                  rowClassName={(row) =>
+                    row.groupKey.toString() === "Total" ? "font-bold" : ""
+                  }
+                />
+              </div>
+            ) : (
+              <div>Summary not found</div>
+            )}
+            {isLoadingBetType ? (
+              <div>Loading Summary...</div>
+            ) : isErrorBetType ? (
+              <div>Error fetching summary</div>
+            ) : betTypeSummary && betTypeSummary.length > 0 ? (
+              <div>
+                <DataTable
+                  link="/results"
+                  header="Bet Results By Bet Type"
+                  data={betTypeSummary}
+                  columns={[
+                    { label: "Threshold", key: "groupLabel" },
+                    { label: "Total Bets", key: "nBets" },
+                    { label: "Hits", key: "nHits" },
+                    {
+                      label: "Hit Rate",
+                      key: "hitRate",
+                      format: (value) => `${(Number(value) * 100).toFixed(1)}%`,
+                    },
+                    {
+                      label: "Profit",
+                      key: "totalProfit",
+                      format: (value) => `$${Number(value).toFixed(2)}`,
+                    },
+                  ]}
+                  rowKey={(row) => String(row.groupKey)}
+                  rowClassName={(row) =>
+                    row.groupKey.toString() === "Total" ? "font-bold" : ""
+                  }
+                />
+              </div>
+            ) : (
+              <div>Summary not found</div>
+            )}
+
+            {isLoadingBetDate ? (
+              <div>Loading Summary...</div>
+            ) : isErrorBetDate ? (
+              <div>Error fetching summary</div>
+            ) : betDateSummary && betDateSummary.length > 0 ? (
+              <div>
+                <DataTable
+                  link="/results"
+                  header="Bet Results By Date"
+                  data={betDateSummary}
+                  columns={[
+                    { label: "Date", key: "groupLabel" },
+                    { label: "Total Bets", key: "nBets" },
+                    { label: "Hits", key: "nHits" },
+                    {
+                      label: "Hit Rate",
+                      key: "hitRate",
+                      format: (value) => `${(Number(value) * 100).toFixed(1)}%`,
+                    },
+                    {
+                      label: "Profit",
+                      key: "totalProfit",
+                      format: (value) => `$${Number(value).toFixed(2)}`,
+                    },
+                  ]}
+                  rowKey={(row) => String(row.groupKey)}
+                  rowClassName={(row) =>
+                    row.groupKey.toString() === "Total" ? "font-bold" : ""
+                  }
+                />
+              </div>
+            ) : (
+              <div>Summary not found</div>
+            )}
     </div>
   )
 }
