@@ -69,6 +69,7 @@ export async function fetchResultSummary(
   if (params.threshold) qs.set("threshold", params.threshold)
   if (params.limit) qs.set("limit", params.limit)
   if (params.orderBy) qs.set("order_by", params.orderBy)
+  if (params.bucketWidth) qs.set("bucket_width", params.bucketWidth)
 
   return api.get<BetResultSummary<string>[]>(`/bets/results/summary?${qs}`)
 }

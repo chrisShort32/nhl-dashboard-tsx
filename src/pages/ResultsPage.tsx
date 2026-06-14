@@ -3,9 +3,6 @@ import type { FilterState } from "@/features/types"
 import { useBetResults, useBetSummary, useCumulativeProfit } from "@/features/queries"
 import { DataTable } from "@/components/ui/DataTable"
 import {
-  calibration,
-} from "@/features/betting/utils"
-import {
   ResponsiveContainer,
   CartesianGrid,
   Line,
@@ -47,6 +44,11 @@ const THRESHOLD_OPTIONS = [
   { label: "All", value: "all" },
 ]
 
+const PLAYOFF_DATES = {
+  startDate: "2026-04-18",
+  endDate: "2026-06-11",
+}
+
 export function ResultsPage() {
   //const [filter, setFilter] = useState<FilterState>({dateRange: 'all', typeFilter: 'all', thresholdFilter: 'all'})
   //const today = new Date()
@@ -87,11 +89,20 @@ export function ResultsPage() {
     isLoading: isLoadingProfit,
     isError: isErrorProfit,
   } = useCumulativeProfit(
-    "2026-05-16", // startDate
-    "2026-06-11" // endDate
+    PLAYOFF_DATES.startDate,
+    PLAYOFF_DATES.endDate
   )
 
-
+  const {
+    data: edgeBuckets,
+    isLoading: isLoadingEdge,
+    isError: isErrorEdge,
+  } = useBetSummary({
+    pivot: "edge",
+    startDate: PLAYOFF_DATES.startDate,
+    endDate: PLAYOFF_DATES.endDate,
+    bucketWidth: "0.05"
+  })
 
   /* // calibration data
     const CALIBRATION_MAX = 0.70 // max bet_p for buckets
@@ -195,7 +206,6 @@ export function ResultsPage() {
         ) : (
             <div>Summary not found</div>
       )}
-
       {isLoadingThreshold ? (
               <div>Loading Summary...</div>
             ) : isErrorThreshold ? (
@@ -264,7 +274,6 @@ export function ResultsPage() {
             ) : (
               <div>Summary not found</div>
             )}
-
             {isLoadingBetDate ? (
               <div>Loading Summary...</div>
             ) : isErrorBetDate ? (
@@ -298,6 +307,23 @@ export function ResultsPage() {
               </div>
             ) : (
               <div>Summary not found</div>
+            )}
+            {isLoadingEdge ? (
+              <div>Loading Edge Chart...</div>
+            ) : isErrorEdge ? (
+              <div>Error fetching edge data</div>
+            ) : edgeBuckets && edgeBuckets.length > 0 ? (
+              <div>
+                <AnalysisChart
+                  data={edgeBuckets}
+                  maxBucket={0.5}
+                  bucketWidth={0.05}
+                  pivot="bet_edge"
+                  chartType="hitRate"
+                />
+              </div>
+            ) : (
+              <div>Edge data not found</div>
             )}
     </div>
   )

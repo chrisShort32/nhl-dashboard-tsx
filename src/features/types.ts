@@ -136,7 +136,7 @@ export type BetResultParams = {
 }
 
 export type SummaryParams = {
-  pivot: "threshold" | "side" | "bet_type" | "player" | "team" | "bet_date"
+  pivot: "threshold" | "side" | "bet_type" | "player" | "team" | "bet_date" | "edge"
   startDate?: string
   endDate?: string
   teamId?: string
@@ -146,6 +146,7 @@ export type SummaryParams = {
   threshold?: "2" | "3" | "4" | "5"
   limit?: string
   orderBy?: "asc" | "desc"
+  bucketWidth?: string
 }
 
 /************* 

@@ -9,12 +9,12 @@ import {
   ReferenceLine,
 } from "recharts"
 import type { TooltipContentProps } from "recharts"
-import type { CalibrationResult } from "@/features/types"
+import type { BetResultSummary } from "@/features/types"
 
 type ChartProps = {
   chartType: "profit" | "hitRate"
   pivot: "bet_p" | "bet_edge"
-  data: CalibrationResult[]
+  data: BetResultSummary<string>[]
   maxBucket: number
   bucketWidth: number
 }
@@ -28,7 +28,8 @@ export function AnalysisChart({
   const xLabel = pivot === "bet_p" ? "Bet Probability" : "Bet Edge"
   const yLabel = chartType === "profit" ? "Profit" : "Hit Rate"
   const header = `${xLabel} vs ${yLabel}`
-  const diagRefLine = chartType === "hitRate" && pivot === "bet_p"
+  const diagRefLine = chartType === "hitRate"
+  
 
   const refLineY = chartType === "hitRate" ? 0.5 : 0
 
@@ -37,11 +38,11 @@ export function AnalysisChart({
     const isVisible = active && payload && payload.length
     if (!isVisible) return null
 
-    const point = payload[0].payload as CalibrationResult
+    const point = payload[0].payload as BetResultSummary<string>
     const value =
       chartType === "hitRate"
         ? `${(point.hitRate * 100).toFixed(2)}%`
-        : `$${point.profit.toFixed(2)}`
+        : `$${point.totalProfit.toFixed(2)}`
     return (
       <div
         className="custom-tooltip"
@@ -50,13 +51,12 @@ export function AnalysisChart({
         {isVisible && (
           <>
             <p>{`${yLabel}: ${value}`}</p>
-            <p>{`Total Bets: ${point.totalBets}`}</p>
+            <p>{`Total Bets: ${point.nBets}`}</p>
           </>
         )}
       </div>
     )
   }
-
   return (
     <div className="m-5">
       <h1 className="text-xl font-bold p-5 m-5">{header}</h1>
@@ -64,7 +64,7 @@ export function AnalysisChart({
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="5 5" stroke="grey" />
           <XAxis
-            dataKey="bucketLowerBound"
+            dataKey="groupKey"
             tickFormatter={(value: number) => {
               if (value >= maxBucket) return `${(maxBucket * 100).toFixed(1)}%+`
               return `${(value * 100).toFixed(1)}%`
@@ -102,7 +102,7 @@ export function AnalysisChart({
           {diagRefLine && (
             <Line
               type="monotone"
-              dataKey="bucketLowerBound"
+              dataKey="groupKey"
               stroke="gold"
               dot={false}
             />
@@ -116,9 +116,9 @@ export function AnalysisChart({
             dot={(props) => {
               const { cx, cy, payload } = props
               const value =
-                chartType === "hitRate" ? payload.hitRate : payload.profit
+                chartType === "hitRate" ? payload.hitRate : payload.totalProfit
               const redGreenValue = diagRefLine
-                ? payload.bucketLowerBound
+                ? payload.bucketWidth
                 : refLineY
               const color = value >= redGreenValue ? "#0ffa26" : "#ef4444"
               return (
