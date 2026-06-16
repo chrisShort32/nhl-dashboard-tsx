@@ -15,7 +15,8 @@ import {
   Tooltip,
   ReferenceLine,
 } from "recharts"
-import { AnalysisChart } from "@/features/betting/components/AnalysisChart"
+import { AnalysisLineChart } from "@/features/betting/components/AnalysisLineChart"
+import type { ChartMetaData } from "@/features/betting/components/AnalysisLineChart"
 
 const DATE_RANGE_OPTIONS = [
   { label: "Yesterday", value: 0 },
@@ -49,11 +50,15 @@ const PLAYOFF_DATES = {
   endDate: "2026-06-11",
 }
 
+const BET_DATA_DATES = {
+  startDate: "2026-01-01",
+  endDate: "2026-06-11",
+}
+
 export function ResultsPage() {
   //const [filter, setFilter] = useState<FilterState>({dateRange: 'all', typeFilter: 'all', thresholdFilter: 'all'})
   //const today = new Date()
   //const todayString = today.toISOString().split('T')[0]
-  //const filtered = betResults ? applyFilters(betResults, filter) : []
   const {
     data: thresholdSummary,
     isLoading: isLoadingThreshold,
@@ -104,38 +109,64 @@ export function ResultsPage() {
     bucketWidth: "0.05"
   })
 
-  /* // calibration data
-    const CALIBRATION_MAX = 0.70 // max bet_p for buckets
-    const CALIBRATION_BUCKET_WIDTH = 0.05
-    const calibrationBuckets = calibration(filtered, CALIBRATION_BUCKET_WIDTH, CALIBRATION_MAX, 'bet_p')
-    
-    // edge data
-    const EDGE_MAX = 0.20 // max edge for buckets
-    const EDGE_BUCKET_WIDTH = 0.025
-    const edgeBuckets = calibration(filtered, EDGE_BUCKET_WIDTH, EDGE_MAX, 'edge')
-    
-    // data for the profit line graph
-    const chartData = computeCumulativeProfit(filtered)
-    const betSummaryThreshold = summarizeBetResults<number>(filtered, 'threshold', { includeTotals: true })
-    const betSummaryBetType = summarizeBetResults<string>(filtered, 'bet_type', { includeTotals: true })
-    
-    // summary of bet types by threshold together
-    const compoundSummary = summarizeBetResults<string, 'threshold' | 'bet_type'>(filtered, (r) => `${r.threshold}|${r.bet_type}`, { additionalFields: ['threshold', 'bet_type']})
-    const chartsByThreshold = new Map<number, typeof compoundSummary>()
-    compoundSummary.forEach((result) => {
-        const threshold = result.threshold ?? 0
+  const {
+    data: oddsBuckets,
+    isLoading: isLoadingOdds,
+    isError: isErrorOdds,
+  } = useBetSummary({
+    pivot: "odds",
+    startDate: BET_DATA_DATES.startDate,
+    endDate: BET_DATA_DATES.endDate,
+    bucketWidth: "0.1"
+  })
+  
+  const oddsMetaData: ChartMetaData = {
+    header: "Odds vs Profit",
+    xLabel: "Odds (Decimal)",
+    yLabel: "Profit",
+    xDataType: "decimal",
+    yDataType: "currency",
+    yField: "totalProfit",
+    referenceLine: "horizontal",
+    showLine: true
+  }
 
-        if (!chartsByThreshold.has(threshold)) {
-            chartsByThreshold.set(threshold,[result])
-        }
-        else {
-            chartsByThreshold.get(threshold)?.push(result)
-        }
-    })
-    const maxBets = Math.max(...compoundSummary.map(r => r.total_bets))
- */
+  const {
+    data: betProbBuckets,
+    isLoading: isLoadingBetP,
+    isError: isErrorBetP,
+  } = useBetSummary({
+    pivot: "bet_probability",
+    startDate: BET_DATA_DATES.startDate,
+    endDate: BET_DATA_DATES.endDate,
+    bucketWidth: "0.025"
+  })
+    const betProbMetaData: ChartMetaData = {
+    header: "Model Probability vs Hit Rate",
+    xLabel: "Model Probability",
+    yLabel: "Hit Rate",
+    xDataType: "percentage",
+    yDataType: "percentage",
+    yField: "hitRate",
+    referenceLine: "diagonal",
+    showLine: false
+  }
+
+    const betProbProfMetaData: ChartMetaData = {
+    header: "Model Probability vs Profit",
+    xLabel: "Model Probability",
+    yLabel: "Profit",
+    xDataType: "percentage",
+    yDataType: "currency",
+    yField: "totalProfit",
+    referenceLine: "diagonal",
+    showLine: true
+  }
+
+
   return (
     <div className="mx-auto max-w-8xl p-6">
+      
       {isLoadingProfit? (
         <div>Loading Cumulative Profit...</div>
       ) : isErrorProfit ? (
@@ -308,22 +339,50 @@ export function ResultsPage() {
             ) : (
               <div>Summary not found</div>
             )}
-            {isLoadingEdge ? (
-              <div>Loading Edge Chart...</div>
-            ) : isErrorEdge ? (
-              <div>Error fetching edge data</div>
-            ) : edgeBuckets && edgeBuckets.length > 0 ? (
+            {isLoadingBetP ? (
+              <div>Loading Bet Probability Chart...</div>
+            ) : isErrorBetP ? (
+              <div>Error fetching Bet Probability data</div>
+            ) : betProbBuckets && betProbBuckets.length > 0 ? (
               <div>
-                <AnalysisChart
-                  data={edgeBuckets}
-                  maxBucket={0.5}
-                  bucketWidth={0.05}
-                  pivot="bet_edge"
-                  chartType="hitRate"
+                <AnalysisLineChart
+                  metaData={betProbMetaData}
+                  data={betProbBuckets}
+                  
                 />
               </div>
             ) : (
-              <div>Edge data not found</div>
+              <div>Bet Probability data not found</div>
+            )}
+            {isLoadingBetP ? (
+              <div>Loading Bet Probability Chart...</div>
+            ) : isErrorBetP ? (
+              <div>Error fetching Bet Probability data</div>
+            ) : betProbBuckets && betProbBuckets.length > 0 ? (
+              <div>
+                <AnalysisLineChart
+                  metaData={betProbProfMetaData}
+                  data={betProbBuckets}
+                  
+                />
+              </div>
+            ) : (
+              <div>Bet Probability data not found</div>
+            )}
+            {isLoadingOdds ? (
+              <div>Loading Odds Chart...</div>
+            ) : isErrorOdds ? (
+              <div>Error fetching Odds data</div>
+            ) : oddsBuckets && oddsBuckets.length > 0 ? (
+              <div>
+                <AnalysisLineChart
+                  metaData={oddsMetaData}
+                  data={oddsBuckets}
+                  
+                />
+              </div>
+            ) : (
+              <div>Odds data not found</div>
             )}
     </div>
   )

@@ -136,7 +136,7 @@ export type BetResultParams = {
 }
 
 export type SummaryParams = {
-  pivot: "threshold" | "side" | "bet_type" | "player" | "team" | "bet_date" | "edge"
+  pivot: "threshold" | "side" | "bet_type" | "player" | "team" | "bet_date" | "edge" | "odds" | "bet_probability"
   startDate?: string
   endDate?: string
   teamId?: string

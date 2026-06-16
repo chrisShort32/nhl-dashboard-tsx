@@ -1,4 +1,4 @@
-import defaultHeadshot from "@/assets/default-skater.png"
+import defaultHeadshot from "/default-skater.png"
 import { getTeamLogo } from "@/features/teamLogos"
 import { Link } from "react-router-dom"
 import type { PlayerInfo, TeamInfo } from "@/features/types"

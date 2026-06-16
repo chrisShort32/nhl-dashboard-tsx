@@ -1,4 +1,4 @@
-import type { BetResult, CalibrationResult } from "../types"
+import type { BetResult } from "../types"
 
 export function tabDateFilter(
   betResults: BetResult[],
@@ -50,51 +50,4 @@ export function tabDateFilter(
   }
 
   return betResults
-}
-
-export function calibration(
-  betResults: BetResult[],
-  bucketWidth: number,
-  maxLowerBound: number,
-  bucketData: "bet_p" | "edge",
-): CalibrationResult[] {
-  if (betResults.length === 0) return []
-  const bucketMap = new Map<number, CalibrationResult>()
-
-  betResults.forEach((result) => {
-    const pivot = bucketData === "bet_p" ? result.bet_p : result.bet_edge
-
-    const bucketNumber = Math.floor(pivot / bucketWidth)
-    let lowerBound = bucketNumber * bucketWidth
-    if (lowerBound > maxLowerBound) {
-      lowerBound = maxLowerBound
-    }
-
-    if (!bucketMap.has(lowerBound)) {
-      bucketMap.set(lowerBound, {
-        bucketWidth,
-        bucketLowerBound: lowerBound,
-        totalBets: 0,
-        totalHits: 0,
-        hitRate: 0,
-        profit: 0,
-      })
-    }
-
-    const bucket = bucketMap.get(lowerBound)!
-
-    bucket.totalBets += 1
-    bucket.totalHits += result.hit
-    bucket.profit += result.profit
-  })
-
-  const calibrationResults = new Array<CalibrationResult>()
-  bucketMap.forEach((bucket) => {
-    bucket.hitRate = bucket.totalHits / bucket.totalBets
-    calibrationResults.push(bucket)
-  })
-
-  calibrationResults.sort((a, b) => a.bucketLowerBound - b.bucketLowerBound)
-
-  return calibrationResults
 }
