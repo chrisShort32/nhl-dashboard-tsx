@@ -139,6 +139,8 @@ export type SummaryParams = {
   pivot: "threshold" | "side" | "bet_type" | "player" | "team" | "bet_date" | "edge" | "odds" | "bet_probability"
   startDate?: string
   endDate?: string
+  playoffs?: string
+  season?: string
   teamId?: string
   playerId?: string
   betType?: "parlay" | "value" | "single" | "under"
@@ -204,9 +206,9 @@ export type CumulativeProfit = {
   Unused??
 **************/
 export type FilterState = {
-  dateRange: 0 | 6 | 30 | 90 | "playoffs" | "all"
-  typeFilter: "over" | "single" | "value" | "parlay" | "under" | "all"
-  thresholdFilter: 2 | 3 | 4 | 5 | 6 | "all" // 6 == 2 and 3 threshold combo
+  dateRange: "reg" | "playoffs" | "all" | undefined
+  typeFilter: "single" | "value" | "parlay" | "under" | "all" | undefined
+  thresholdFilter: "2" | "3" | "4" | "5" | "all" | undefined
 }
 
 export type CalibrationResult = {

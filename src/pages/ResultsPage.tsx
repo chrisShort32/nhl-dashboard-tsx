@@ -2,6 +2,8 @@ import { useState } from "react"
 import type { FilterState } from "@/features/types"
 import { useBetResults, useBetSummary, useCumulativeProfit } from "@/features/queries"
 import { DataTable } from "@/components/ui/DataTable"
+import { AnalysisLineChart } from "@/features/betting/components/AnalysisLineChart"
+import type { ChartMetaData, TooltipProps } from "@/features/betting/components/AnalysisLineChart"
 import {
   ResponsiveContainer,
   CartesianGrid,
@@ -15,20 +17,15 @@ import {
   Tooltip,
   ReferenceLine,
 } from "recharts"
-import { AnalysisLineChart } from "@/features/betting/components/AnalysisLineChart"
-import type { ChartMetaData } from "@/features/betting/components/AnalysisLineChart"
+
 
 const DATE_RANGE_OPTIONS = [
-  { label: "Yesterday", value: 0 },
-  { label: "Last 7", value: 6 },
-  { label: "Last 30", value: 30 },
-  { label: "Last 90", value: 90 },
+  { label: "Regular Season", value: "reg"},
   { label: "Playoffs", value: "playoffs" },
   { label: "All", value: "all" },
 ]
 
 const BET_TYPE_OPTIONS = [
-  { label: "Overs", value: "over" },
   { label: "Singles", value: "single" },
   { label: "Values", value: "value" },
   { label: "Parlays", value: "parlay" },
@@ -37,11 +34,10 @@ const BET_TYPE_OPTIONS = [
 ]
 
 const THRESHOLD_OPTIONS = [
-  { label: "2", value: 2 },
-  { label: "3", value: 3 },
-  { label: "2 and 3", value: 6 },
-  { label: "4", value: 4 },
-  { label: "5", value: 5 },
+  { label: "2", value: "2" },
+  { label: "3", value: "3" },
+  { label: "4", value: "4" },
+  { label: "5", value: "5"},
   { label: "All", value: "all" },
 ]
 
@@ -55,18 +51,28 @@ const BET_DATA_DATES = {
   endDate: "2026-06-11",
 }
 
+function filterToParams(filter: FilterState) {
+  return {
+    playoffs:
+      filter.dateRange === "all" ? undefined
+      : filter.dateRange === "playoffs" ? "true"
+      : "false",
+    betType: filter.typeFilter === "all" ? undefined : filter.typeFilter,
+    threshold: filter.thresholdFilter === "all" ? undefined : filter.thresholdFilter,
+  }
+}
+
 export function ResultsPage() {
-  //const [filter, setFilter] = useState<FilterState>({dateRange: 'all', typeFilter: 'all', thresholdFilter: 'all'})
-  //const today = new Date()
-  //const todayString = today.toISOString().split('T')[0]
+  const [filter, setFilter] = useState<FilterState>({dateRange: "all", typeFilter: "all", thresholdFilter: "all"})
+  const params = filterToParams(filter)
   const {
     data: thresholdSummary,
     isLoading: isLoadingThreshold,
     isError: isErrorThreshold,
   } = useBetSummary({
     pivot: "threshold",
-    startDate: "2026-04-18",
-    endDate: "2026-05-29",
+    playoffs: "true",
+    season: "20252026"
   })
 
   const {
@@ -75,8 +81,7 @@ export function ResultsPage() {
     isError: isErrorBetType,
   } = useBetSummary({
     pivot: "bet_type",
-    startDate: "2026-04-18",
-    endDate: "2026-05-29",
+    ...params
   })
 
   const {
@@ -104,10 +109,21 @@ export function ResultsPage() {
     isError: isErrorEdge,
   } = useBetSummary({
     pivot: "edge",
-    startDate: PLAYOFF_DATES.startDate,
-    endDate: PLAYOFF_DATES.endDate,
+    startDate: BET_DATA_DATES.startDate,
+    endDate: BET_DATA_DATES.endDate,
     bucketWidth: "0.05"
   })
+
+  const edgeMetaData: ChartMetaData = {
+    header: "Edge vs Profit",
+    xLabel: "Edge (Model Probability - Implied Probability)",
+    yLabel: "Profit",
+    xDataType: "percentage",
+    yDataType: "currency",
+    yField: "totalProfit",
+    referenceLine: "horizontal",
+    showLine: true
+  }
 
   const {
     data: oddsBuckets,
@@ -141,7 +157,8 @@ export function ResultsPage() {
     endDate: BET_DATA_DATES.endDate,
     bucketWidth: "0.025"
   })
-    const betProbMetaData: ChartMetaData = {
+  
+  const betProbMetaData: ChartMetaData = {
     header: "Model Probability vs Hit Rate",
     xLabel: "Model Probability",
     yLabel: "Hit Rate",
@@ -152,7 +169,10 @@ export function ResultsPage() {
     showLine: false
   }
 
-    const betProbProfMetaData: ChartMetaData = {
+  const tooltip: TooltipProps = {
+    showHitRate: true
+  }
+  const betProbProfMetaData: ChartMetaData = {
     header: "Model Probability vs Profit",
     xLabel: "Model Probability",
     yLabel: "Profit",
@@ -160,13 +180,80 @@ export function ResultsPage() {
     yDataType: "currency",
     yField: "totalProfit",
     referenceLine: "diagonal",
-    showLine: true
+    showLine: true,
+    
   }
-
 
   return (
     <div className="mx-auto max-w-8xl p-6">
-      
+      <div className="grid grid-cols-3 mt-5 p-10 w-125 items-center">
+        <div className="w-25">
+          <label>
+            Time Period
+            <select
+              className="w-30 mt-2 bg-indigo-500"
+              onChange={(e) => {
+                const selection = e.target.value
+                setFilter((prev) => ({
+                  ...prev,
+                  dateRange: selection as FilterState["dateRange"],
+                }))
+              }}
+              value={filter.dateRange}
+            >
+              {DATE_RANGE_OPTIONS.map((item) => (
+                <option key={item.label} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <div className="w-25">
+          <label>
+            Bet Type
+            <select
+              className="w-30 mt-2 bg-indigo-500"
+              onChange={(e) => {
+                setFilter((prev) => ({
+                  ...prev,
+                  typeFilter: e.target.value as FilterState["typeFilter"],
+                }))
+              }}
+              value={filter.typeFilter}
+            >
+              {BET_TYPE_OPTIONS.map((item) => (
+                <option key={item.label} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <div className="w-25">
+          <label>
+            Bet Line
+            <select
+              className="w-30 mt-2 bg-indigo-500"
+              onChange={(e) => {
+                const raw = e.target.value
+                const parsed = raw === "all" ? "all" : Number(raw)
+                setFilter((prev) => ({
+                  ...prev,
+                  thresholdFilter: parsed as FilterState["thresholdFilter"],
+                }))
+              }}
+              value={filter.thresholdFilter}
+            >
+              {THRESHOLD_OPTIONS.map((item) => (
+                <option key={item.label} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      </div>
       {isLoadingProfit? (
         <div>Loading Cumulative Profit...</div>
       ) : isErrorProfit ? (
@@ -378,11 +465,28 @@ export function ResultsPage() {
                 <AnalysisLineChart
                   metaData={oddsMetaData}
                   data={oddsBuckets}
+                  tooltipProps={tooltip}
                   
                 />
               </div>
             ) : (
               <div>Odds data not found</div>
+            )}
+            {isLoadingEdge ? (
+              <div>Loading Edge Chart...</div>
+            ) : isErrorEdge ? (
+              <div>Error fetching Edge data</div>
+            ) : edgeBuckets && edgeBuckets.length > 0 ? (
+              <div>
+                <AnalysisLineChart
+                  metaData={edgeMetaData}
+                  data={edgeBuckets}
+                  tooltipProps={tooltip}
+                  
+                />
+              </div>
+            ) : (
+              <div>Edge data not found</div>
             )}
     </div>
   )

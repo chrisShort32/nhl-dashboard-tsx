@@ -20,13 +20,19 @@ export type ChartMetaData = {
     yField: "totalProfit" | "hitRate"
     referenceLine: "diagonal" | "horizontal" | "none"
     showLine: boolean 
-    
+}
+
+export type TooltipProps = {
+    showHitRate: boolean
 }
 type ChartProps = {
     data: BetResultSummary<string>[]
     metaData: ChartMetaData
+    tooltipProps?: TooltipProps
     
 }
+
+
 
 function formatByType(value: number, type: ChartMetaData["xDataType"]): string {
     switch (type) {
@@ -38,7 +44,8 @@ function formatByType(value: number, type: ChartMetaData["xDataType"]): string {
 
 export function AnalysisLineChart({
     data,
-    metaData
+    metaData,
+    tooltipProps,
 }: ChartProps) {
     
     // Custom tool tip
@@ -57,6 +64,11 @@ export function AnalysisLineChart({
                     <>
                         <p>{`${metaData.yLabel}: ${value}`}</p>
                         <p>{`Total Bets: ${point.nBets}`}</p>
+                    </>
+                )}
+                {tooltipProps?.showHitRate && (
+                    <>
+                        <p>{`Hit Rate: ${(point.hitRate * 100).toFixed(2)}%`}</p>
                     </>
                 )}
             </div>
@@ -84,8 +96,8 @@ export function AnalysisLineChart({
                     />
                     <YAxis
                         domain={[
-                            (dataMin: number) => Math.min(0, Math.floor(Number(dataMin.toFixed(2)))),
-                            (dataMax: number) => Math.max(1, Math.ceil(Number(dataMax.toFixed(2)))),
+                            (dataMin: number) => metaData.yDataType === "percentage" ? 0 : Math.floor(Number(dataMin.toFixed(2))),
+                            (dataMax: number) => metaData.yDataType === "percentage" ? 1 : Math.ceil(Number(dataMax.toFixed(2))),
                             
                         ]}
                         tickFormatter={(value) => formatByType(value, metaData.yDataType)}
@@ -102,7 +114,7 @@ export function AnalysisLineChart({
                     <Tooltip content={CustomTooltip} />
                     {metaData.referenceLine === "diagonal" && (
                         <Line
-                            type="monotone"
+                            type="linear"
                             dataKey="groupKey"
                             stroke="gold"
                             dot={false}

@@ -62,6 +62,8 @@ export async function fetchResultSummary(
 
   if (params.startDate) qs.set("start_date", params.startDate)
   if (params.endDate) qs.set("end_date", params.endDate)
+  if (params.playoffs) qs.set("playoffs", params.playoffs)
+  if (params.season) qs.set("season", params.season)
   if (params.teamId) qs.set("team_id", params.teamId)
   if (params.playerId) qs.set("player_id", params.playerId)
   if (params.betType) qs.set("bet_type", params.betType)
