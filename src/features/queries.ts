@@ -4,6 +4,7 @@ import type {
   BetResultParams,
   PlayerGamelogParams,
   TeamGamelogParams,
+  CumulativeProfitParams,
 } from "@/features/types"
 import {
   fetchBetResults,
@@ -81,10 +82,10 @@ export function useTeamGamelog(params: TeamGamelogParams) {
   })
 }
 
-export function useCumulativeProfit(startDate: string, endDate: string) {
+export function useCumulativeProfit(params: CumulativeProfitParams) {
   return useQuery({
-    queryKey: ["date", startDate, endDate],
-    queryFn: () => fetchCumulativeProfit(startDate, endDate)
+    queryKey: ["date", params],
+    queryFn: () => fetchCumulativeProfit(params)
   })
 }
 

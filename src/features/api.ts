@@ -13,6 +13,8 @@ import type {
   TeamGamelog,
   TeamGamelogParams,
   CumulativeProfit,
+  GamelogParams,
+  CumulativeProfitParams,
 } from "./types"
 
 // Fetches the latest game row for a single player from the backend.
@@ -101,9 +103,16 @@ export async function fetchTeamGamelogs(
 }
 
 export async function fetchCumulativeProfit(
-  startDate: string, endDate: string,
+  params: CumulativeProfitParams
 ): Promise<CumulativeProfit[]> {
-  return api.get<CumulativeProfit[]>(`/bets/results/timeseries?start_date=${startDate}&end_date=${endDate}`)
+  const qs = new URLSearchParams()
+
+  if (params.startDate) qs.set("start_date", params.startDate)
+  if (params.endDate) qs.set("end_date", params.endDate)
+  if (params.playoffs) qs.set("playoffs", params.playoffs)
+  if (params.season) qs.set("season", params.season)
+
+  return api.get<CumulativeProfit[]>(`/bets/results/timeseries?${qs}`)  
 }
 
 //********************************** */

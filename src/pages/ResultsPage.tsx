@@ -71,8 +71,7 @@ export function ResultsPage() {
     isError: isErrorThreshold,
   } = useBetSummary({
     pivot: "threshold",
-    playoffs: "true",
-    season: "20252026"
+    ...params
   })
 
   const {
@@ -90,18 +89,16 @@ export function ResultsPage() {
     isError: isErrorBetDate,
   } = useBetSummary({
     pivot: "bet_date",
-    startDate: "2026-04-18",
-    endDate: "2026-05-29",
+    ...params
   })
 
   const {
     data: cumulativeProfit,
     isLoading: isLoadingProfit,
     isError: isErrorProfit,
-  } = useCumulativeProfit(
-    PLAYOFF_DATES.startDate,
-    PLAYOFF_DATES.endDate
-  )
+  } = useCumulativeProfit({
+    ...params
+  })
 
   const {
     data: edgeBuckets,

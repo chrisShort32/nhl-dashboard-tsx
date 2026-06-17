@@ -151,6 +151,13 @@ export type SummaryParams = {
   bucketWidth?: string
 }
 
+export type CumulativeProfitParams = {
+  startDate?: string | undefined
+  endDate?: string | undefined
+  season?: string | undefined
+  playoffs?: string | undefined
+}
+
 /************* 
   Bet Types
 **************/
