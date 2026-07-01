@@ -1,12 +1,20 @@
-import { useTopPlayers, useBetSummary, usePlayerInfo } from "@/features/queries"
+import { useAllPlayers, useBetSummary, usePlayerInfo } from "@/features/queries"
 import { PlayerSnapshot } from "@/features/player/components/PlayerSnapshot"
 import { BetSummary } from "@/features/betting/BetSummary"
 import { PlayerCard } from "@/features/player/components/PlayerCard"
-import { Tabs } from "@/components/ui/Tabs"
-import { tabDateFilter } from "@/features/betting/utils"
-import { useMemo, useState } from "react"
+import { SearchComboBox } from "@/components/ui/SearchComboBox"
+import { useNavigate } from "react-router-dom"
+import { useState } from "react"
 
-export function PlayersHomePage() {
+export function PlayersHomePage() {  
+  const {
+    data: allPlayers,
+    isLoading: isLoadingAll,
+    isError: isErrorAll,
+  } = usePlayerInfo([])
+
+  const navigate = useNavigate()
+
   const {
     data: betSummaryPlayerTop,
     isLoading: isLoadingSummaryTop,
@@ -47,9 +55,20 @@ export function PlayersHomePage() {
     const player = playerById.get(Number(s.groupKey))
     return player ? [{ ...s, player }] : []
   })
-
   return (
     <div className="mx-auto max-w-8xl p-6">
+      <div>
+        {allPlayers && (
+          <SearchComboBox
+            items={allPlayers}
+            getKey={(p) => p.id}
+            getLabel={(p) => p.fullName}
+            onSelect={(p) => navigate(`/player/${p.id}`)}
+            placeholder=" Search Players"
+          />
+        )}
+      </div>
+      
       {isLoadingSummaryTop ? (
         <div>Loading Data...</div>
       ) : isErrorSummaryTop ? (

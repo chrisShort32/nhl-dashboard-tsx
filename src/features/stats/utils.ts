@@ -1,4 +1,4 @@
-import type { PlayerGameLog } from "@/features/types"
+import type { PlayerGamelog } from "@/features/types"
 
 export type StatSnapshot = {
   snapshotHorizon: string
@@ -15,14 +15,14 @@ export type StatSnapshot = {
   shotAttemptsPerGame: number
 }
 
-export function calculatePlayerStats(gamelog: PlayerGameLog[]): StatSnapshot {
+export function calculatePlayerStats(gamelog: PlayerGamelog[]): StatSnapshot {
   // Calculate totals and avgs
   const goalsTotal = gamelog.reduce((sum, game) => sum + game.goals, 0)
   const assistsTotal = gamelog.reduce((sum, game) => sum + game.assists, 0)
   const pointsTotal = gamelog.reduce((sum, game) => sum + game.points, 0)
-  const shotsTotal = gamelog.reduce((sum, game) => sum + game.shots_on_goal, 0)
+  const shotsTotal = gamelog.reduce((sum, game) => sum + game.shotsOnGoal, 0)
   const shotAttemptsTotal = gamelog.reduce(
-    (sum, game) => sum + game.shot_attempts_total,
+    (sum, game) => sum + game.shotAttemptsTotal,
     0,
   )
 

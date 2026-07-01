@@ -13,7 +13,6 @@ import type {
   TeamGamelog,
   TeamGamelogParams,
   CumulativeProfit,
-  GamelogParams,
   CumulativeProfitParams,
 } from "./types"
 
@@ -113,6 +112,12 @@ export async function fetchCumulativeProfit(
   if (params.season) qs.set("season", params.season)
 
   return api.get<CumulativeProfit[]>(`/bets/results/timeseries?${qs}`)  
+}
+
+export async function fetchAllPlayers(
+
+): Promise<PlayerInfo[]> {
+  return api.get<PlayerInfo[]>("/players/all")
 }
 
 //********************************** */

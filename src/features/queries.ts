@@ -17,6 +17,7 @@ import {
   fetchTeamInfo,
   fetchTeamGamelogs,
   fetchCumulativeProfit,
+  fetchAllPlayers,
 } from "./api"
 
 // Query hook for the bet results for the last X games (default to 7)
@@ -86,6 +87,13 @@ export function useCumulativeProfit(params: CumulativeProfitParams) {
   return useQuery({
     queryKey: ["date", params],
     queryFn: () => fetchCumulativeProfit(params)
+  })
+}
+
+export function useAllPlayers() {
+  return useQuery({
+    queryKey: ["players"],
+    queryFn: fetchAllPlayers
   })
 }
 

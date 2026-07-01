@@ -35,8 +35,6 @@ export function PlayerPage() {
     isError,
   } = useBetResults({
     playerId: playerId,
-    startDate: "2026-04-18",
-    endDate: "2026-06-04",
   })
 
   const {
@@ -45,8 +43,6 @@ export function PlayerPage() {
     isError: isErrorSummary,
   } = useBetSummary({
     pivot: "player",
-    startDate: "2026-04-18",
-    endDate: "2026-06-04",
     playerId: playerId,
   })
 
@@ -59,10 +55,10 @@ export function PlayerPage() {
       ) : playerInfo && gamelog && betSummaryPlayer ? (
         <div>
           <PlayerCard playerInfo={playerInfo[0]}>
-            <PlayerSnapshot gamelog={gamelog} playoffs={true}></PlayerSnapshot>
+            <PlayerSnapshot gamelog={gamelog} playoffs={false}></PlayerSnapshot>
 
             <BetSummary
-              summaryHorizon="Bet Results (Playoffs)"
+              summaryHorizon="Bet Results"
               totalBets={betSummaryPlayer[0].nBets}
               hits={betSummaryPlayer[0].nHits}
               hitRate={betSummaryPlayer[0].hitRate}

@@ -1,8 +1,8 @@
 import { calculatePlayerStats } from "@/features/stats/utils"
-import type { PlayerGameLog } from "@/features/types"
+import type { PlayerGamelog } from "@/features/types"
 
 type PlayerSnapShotProps = {
-  gamelog: PlayerGameLog[]
+  gamelog: PlayerGamelog[]
   playoffs?: boolean
 }
 
