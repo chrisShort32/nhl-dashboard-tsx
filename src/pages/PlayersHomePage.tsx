@@ -55,8 +55,9 @@ export function PlayersHomePage() {
     const player = playerById.get(Number(s.groupKey))
     return player ? [{ ...s, player }] : []
   })
+
   return (
-    <div className="mx-auto max-w-8xl p-6">
+    <div className="mx-auto p-6">
       <div>
         {allPlayers && (
           <SearchComboBox

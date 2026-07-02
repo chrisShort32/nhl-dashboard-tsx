@@ -128,6 +128,7 @@ export type TeamGamelogParams = GamelogParams & {
 export type BetResultParams = {
   startDate?: string
   endDate?: string
+  playoffs?: string
   teamId?: string
   playerId?: string
   betType?: "parlay" | "value" | "single" | "under"

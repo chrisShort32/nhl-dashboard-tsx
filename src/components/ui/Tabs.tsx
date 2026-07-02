@@ -6,7 +6,7 @@ type Tab = {
 type TabsProps = {
   tabs: Tab[]
   activeTab: string
-  onChange: (value: string) => void
+  onChange: (value: any) => void
 }
 
 export function Tabs({ tabs, activeTab, onChange }: TabsProps) {
