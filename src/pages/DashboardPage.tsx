@@ -1,13 +1,8 @@
 import {
-  useBetResults,
-  useSuggestedBets,
   useMatchups,
   usePlayerInfo,
   useBetSummary,
 } from "@/features/queries"
-import { tabDateFilter } from "@/features/betting/utils"
-import { Tabs } from "@/components/ui/Tabs"
-import { useState } from "react"
 import { DataTable } from "@/components/ui/DataTable"
 import { SlateCard } from "@/components/ui/SlateCard"
 import { PlayerCard } from "@/features/player/components/PlayerCard"

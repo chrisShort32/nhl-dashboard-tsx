@@ -1,11 +1,10 @@
-import { useAllPlayers, useBetSummary, usePlayerInfo } from "@/features/queries"
-import { PlayerSnapshot } from "@/features/player/components/PlayerSnapshot"
+import { useBetSummary, usePlayerInfo } from "@/features/queries"
 import { BetSummary } from "@/features/betting/BetSummary"
 import { PlayerCard } from "@/features/player/components/PlayerCard"
 import { SearchComboBox } from "@/components/ui/SearchComboBox"
 import { AsyncSection } from "@/components/ui/AsyncSection"
 import { useNavigate } from "react-router-dom"
-import { useState } from "react"
+
 
 export function PlayersHomePage() {  
   const {
@@ -60,18 +59,25 @@ export function PlayersHomePage() {
   return (
     <div className="mx-auto p-6">
       <div>
-        
-        {allPlayers && (
-          <SearchComboBox
-            items={allPlayers}
-            getKey={(p) => p.id}
-            getLabel={(p) => p.fullName}
-            onSelect={(p) => navigate(`/player/${p.id}`)}
-            placeholder=" Search Players"
-          />
+        <AsyncSection
+          isLoading={isLoadingAll}
+          isError={isErrorAll}
+          data={allPlayers}
+          loadingFallback={<div>Loading All Players...</div>}
+          errorFallback={<div>Error fetching Players</div>}
+          emptyFallback={<div>No Players Found</div>}
+        >
+          {(allPlayers) => (
+            <SearchComboBox
+              items={allPlayers}
+              getKey={(p) => p.id}
+              getLabel={(p) => p.fullName}
+              onSelect={(p) => navigate(`/player/${p.id}`)}
+              placeholder=" Search Players"
+            />
         )}
+        </AsyncSection>
       </div>
-      
       <AsyncSection
         isLoading={isLoadingSummaryTop}
         isError={isErrorSummaryTop}
