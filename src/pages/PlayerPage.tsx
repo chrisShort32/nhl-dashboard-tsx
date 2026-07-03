@@ -13,10 +13,12 @@ import { AsyncSection } from "@/components/ui/AsyncSection"
 import { Tabs } from "@/components/ui/Tabs"
 import { useState } from "react"
 
+type GamelogView = "regSeason" | "playoffs" | "full"
+
 export function PlayerPage() {
   const { playerId } = useParams<{ playerId: string }>()
-  if (!playerId) return <div>No Player ID</div>
-  type GamelogView = "regSeason" | "playoffs" | "full"
+  if (!playerId) return <div>No player ID</div>
+  
   const [activeView, setActiveView] = useState<GamelogView>("regSeason")
   
   const {
@@ -128,6 +130,8 @@ export function PlayerPage() {
   const activeGamelog = gamelogsByView[activeView]
   const activeSummary = betSummariesByView[activeView]
   const activeResults = betResultsByView[activeView]
+
+  if (!playerId) return <div>No Player ID</div>
 
 
   return (

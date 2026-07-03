@@ -99,7 +99,14 @@ export async function fetchTeamInfo(): Promise<TeamInfo[]> {
 export async function fetchTeamGamelogs(
   params: TeamGamelogParams,
 ): Promise<TeamGamelog[]> {
-  return api.get<TeamGamelog[]>(`/teams/${params.teamId}/gamelogs`)
+  const qs = new URLSearchParams()
+
+  if (params.startDate) qs.set("start_date", params.startDate)
+  if (params.endDate) qs.set("end_date", params.endDate)
+  if (params.season) qs.set("season", params.season)
+  if (params.playoffs) qs.set("playoffs", params.playoffs)
+
+  return api.get<TeamGamelog[]>(`/teams/${params.teamId}/gamelogs?${qs}`)
 }
 
 export async function fetchCumulativeProfit(

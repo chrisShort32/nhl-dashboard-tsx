@@ -3,6 +3,7 @@ import type { FilterState } from "@/features/types"
 import { useBetResults, useBetSummary, useCumulativeProfit } from "@/features/queries"
 import { DataTable } from "@/components/ui/DataTable"
 import { AnalysisLineChart } from "@/features/betting/components/AnalysisLineChart"
+import { AsyncSection } from "@/components/ui/AsyncSection"
 import type { ChartMetaData, TooltipProps } from "@/features/betting/components/AnalysisLineChart"
 import {
   ResponsiveContainer,
@@ -251,240 +252,250 @@ export function ResultsPage() {
           </label>
         </div>
       </div>
-      {isLoadingProfit? (
-        <div>Loading Cumulative Profit...</div>
-      ) : isErrorProfit ? (
-        <div>Error fetching profit data</div>
-      ) : cumulativeProfit && cumulativeProfit.length > 0? (
-        <div className="ml-5">
-          <h1 className="text-3xl font-bold p-5 m-5">Profit Over Time</h1>
-          <ResponsiveContainer width="90%" height={500}>
-            <LineChart data={cumulativeProfit} title={"Profit Over Time"}>
-              <CartesianGrid strokeDasharray="5 5" />
-              <XAxis
-                dataKey="betDate"
-                tick={{ fontSize: 12, fill: "#ffffff" }}
-                label={{
-                  value: "Date",
-                  position: "insideBottom",
-                  offset: 0,
-                  fill: "#ffffff",
-                }}
-                height={60}
-                stroke="#ffffff"
-              />
-              <YAxis
-                domain={[
-                  (dataMin: number) => Math.min(-5, dataMin - 1),
-                  (dataMax: number) => Math.max(5, dataMax + 1),
+      <AsyncSection
+        isLoading={isLoadingProfit}
+        isError={isErrorProfit}
+        data={cumulativeProfit}
+        loadingFallback={<div>Loading Cumulative Profit Chart...</div>}
+        errorFallback={<div>Error fetching Cumulative Profit Chart</div>}
+        emptyFallback={<div className="p-4">No Cumulative Profit Found</div>}
+      >
+        {(cumulativeProfit) => (
+          <div className="ml-5">
+            <h1 className="text-3xl font-bold p-5 m-5">Profit Over Time</h1>
+            <ResponsiveContainer width="90%" height={500}>
+              <LineChart data={cumulativeProfit} title={"Profit Over Time"}>
+                <CartesianGrid strokeDasharray="5 5" />
+                <XAxis
+                  dataKey="betDate"
+                  tick={{ fontSize: 12, fill: "#ffffff" }}
+                  label={{
+                    value: "Date",
+                    position: "insideBottom",
+                    offset: 0,
+                    fill: "#ffffff",
+                  }}
+                  height={60}
+                  stroke="#ffffff"
+                />
+                <YAxis
+                  domain={[
+                    (dataMin: number) => Math.min(-5, dataMin - 1),
+                    (dataMax: number) => Math.max(5, dataMax + 1),
+                  ]}
+                  tickFormatter={(value) => `$${value.toFixed(0)}`}
+                  tick={{ fontSize: 12, fill: "#ffffff" }}
+                  label={{
+                    value: "Profit ($)",
+                    angle: -90,
+                    position: "insideLeft",
+                    fill: "#ffffff",
+                  }}
+                  stroke="#ffffff"
+                />
+                <Tooltip
+                  formatter={(value) => [`$${(Number(value).toFixed(2))}`, "Cumulative Profit"]}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="cumulativeProfit"
+                  stroke="#6366f1"
+                  dot={(props) => {
+                    const { cx, cy, payload } = props
+                    const color = payload.cumulativeProfit >= 0 ? "#0ffa26" : "#ef4444"
+                    return (
+                      <circle
+                        cx={cx}
+                        cy={cy}
+                        r={6}
+                        strokeWidth={2}
+                        fill={color}
+                      />
+                    )
+                  }}
+                />
+                <ReferenceLine
+                  y={0}
+                  stroke="gold"
+                  label={{ fill: "white", value: "Break Even" }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+            </div>
+          )}
+        </AsyncSection>
+        <AsyncSection
+          isLoading={isLoadingThreshold}
+          isError={isErrorThreshold}
+          data={thresholdSummary}
+          loadingFallback={<div>Loading Threshold Summary...</div>}
+          errorFallback={<div>Error fetching Threshold Summary</div>}
+          emptyFallback={<div className="p-4">No Threshold Data Found</div>}
+        >
+          {(thresholdSummary) => (
+            <div>
+              <DataTable
+                link="/results"
+                header="Bet Results By Threshold"
+                data={thresholdSummary}
+                columns={[
+                  { label: "Threshold", key: "groupLabel" },
+                  { label: "Total Bets", key: "nBets" },
+                  { label: "Hits", key: "nHits" },
+                  {
+                    label: "Hit Rate",
+                    key: "hitRate",
+                    format: (value) => `${(Number(value) * 100).toFixed(1)}%`,
+                  },
+                  {
+                    label: "Profit",
+                    key: "totalProfit",
+                    format: (value) => `$${Number(value).toFixed(2)}`,
+                  },
                 ]}
-                tickFormatter={(value) => `$${value.toFixed(0)}`}
-                tick={{ fontSize: 12, fill: "#ffffff" }}
-                label={{
-                  value: "Profit ($)",
-                  angle: -90,
-                  position: "insideLeft",
-                  fill: "#ffffff",
-                }}
-                stroke="#ffffff"
+                rowKey={(row) => String(row.groupKey)}
+                rowClassName={(row) =>
+                  row.groupKey.toString() === "Total" ? "font-bold" : ""
+                }
               />
-              <Tooltip
-                formatter={(value) => [`$${(Number(value).toFixed(2))}`, "Cumulative Profit"]}
+            </div>
+          )}
+        </AsyncSection>
+        <AsyncSection
+          isLoading={isLoadingBetType}
+          isError={isErrorBetType}
+          data={betTypeSummary}
+          loadingFallback={<div>Loading Bet Type Summary...</div>}
+          errorFallback={<div>Error fetching Bet Type Summary</div>}
+          emptyFallback={<div className="p-4">No Bet Type Data Found</div>}
+        >
+          {(betTypeSummary) => (
+            <div>
+              <DataTable
+                link="/results"
+                header="Bet Results By Bet Type"
+                data={betTypeSummary}
+                columns={[
+                  { label: "Threshold", key: "groupLabel" },
+                  { label: "Total Bets", key: "nBets" },
+                  { label: "Hits", key: "nHits" },
+                  {
+                    label: "Hit Rate",
+                    key: "hitRate",
+                    format: (value) => `${(Number(value) * 100).toFixed(1)}%`,
+                  },
+                  {
+                    label: "Profit",
+                    key: "totalProfit",
+                    format: (value) => `$${Number(value).toFixed(2)}`,
+                  },
+                ]}
+                rowKey={(row) => String(row.groupKey)}
+                rowClassName={(row) =>
+                  row.groupKey.toString() === "Total" ? "font-bold" : ""
+                }
               />
-
-              <Line
-                type="monotone"
-                dataKey="cumulativeProfit"
-                stroke="#6366f1"
-                dot={(props) => {
-                  const { cx, cy, payload } = props
-                  const color = payload.cumulativeProfit >= 0 ? "#0ffa26" : "#ef4444"
-                  return (
-                    <circle
-                      cx={cx}
-                      cy={cy}
-                      r={6}
-                      strokeWidth={2}
-                      fill={color}
-                    />
-                  )
-                }}
+            </div>
+          )}
+        </AsyncSection>
+        <AsyncSection
+          isLoading={isLoadingBetDate}
+          isError={isErrorBetDate}
+          data={betDateSummary}
+          loadingFallback={<div>Loading Bet Date Summary...</div>}
+          errorFallback={<div>Error fetching Bet Date Summary</div>}
+          emptyFallback={<div className="p-4">No Bet Date Data Found</div>}
+        >
+          {(betDateSummary) => (
+            <div>
+              <DataTable
+                link="/results"
+                header="Bet Results By Date"
+                data={betDateSummary}
+                columns={[
+                  { label: "Date", key: "groupLabel" },
+                  { label: "Total Bets", key: "nBets" },
+                  { label: "Hits", key: "nHits" },
+                  {
+                    label: "Hit Rate",
+                    key: "hitRate",
+                    format: (value) => `${(Number(value) * 100).toFixed(1)}%`,
+                  },
+                  {
+                    label: "Profit",
+                    key: "totalProfit",
+                    format: (value) => `$${Number(value).toFixed(2)}`,
+                  },
+                ]}
+                rowKey={(row) => String(row.groupKey)}
+                rowClassName={(row) =>
+                  row.groupKey.toString() === "Total" ? "font-bold" : ""
+                }
               />
-              <ReferenceLine
-                y={0}
-                stroke="gold"
-                label={{ fill: "white", value: "Break Even" }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-          </div>
-        ) : (
-            <div>Summary not found</div>
-      )}
-      {isLoadingThreshold ? (
-              <div>Loading Summary...</div>
-            ) : isErrorThreshold ? (
-              <div>Error fetching summary</div>
-            ) : thresholdSummary && thresholdSummary.length > 0 ? (
-              <div>
-                <DataTable
-                  link="/results"
-                  header="Bet Results By Threshold"
-                  data={thresholdSummary}
-                  columns={[
-                    { label: "Threshold", key: "groupLabel" },
-                    { label: "Total Bets", key: "nBets" },
-                    { label: "Hits", key: "nHits" },
-                    {
-                      label: "Hit Rate",
-                      key: "hitRate",
-                      format: (value) => `${(Number(value) * 100).toFixed(1)}%`,
-                    },
-                    {
-                      label: "Profit",
-                      key: "totalProfit",
-                      format: (value) => `$${Number(value).toFixed(2)}`,
-                    },
-                  ]}
-                  rowKey={(row) => String(row.groupKey)}
-                  rowClassName={(row) =>
-                    row.groupKey.toString() === "Total" ? "font-bold" : ""
-                  }
-                />
-              </div>
-            ) : (
-              <div>Summary not found</div>
-            )}
-            {isLoadingBetType ? (
-              <div>Loading Summary...</div>
-            ) : isErrorBetType ? (
-              <div>Error fetching summary</div>
-            ) : betTypeSummary && betTypeSummary.length > 0 ? (
-              <div>
-                <DataTable
-                  link="/results"
-                  header="Bet Results By Bet Type"
-                  data={betTypeSummary}
-                  columns={[
-                    { label: "Threshold", key: "groupLabel" },
-                    { label: "Total Bets", key: "nBets" },
-                    { label: "Hits", key: "nHits" },
-                    {
-                      label: "Hit Rate",
-                      key: "hitRate",
-                      format: (value) => `${(Number(value) * 100).toFixed(1)}%`,
-                    },
-                    {
-                      label: "Profit",
-                      key: "totalProfit",
-                      format: (value) => `$${Number(value).toFixed(2)}`,
-                    },
-                  ]}
-                  rowKey={(row) => String(row.groupKey)}
-                  rowClassName={(row) =>
-                    row.groupKey.toString() === "Total" ? "font-bold" : ""
-                  }
-                />
-              </div>
-            ) : (
-              <div>Summary not found</div>
-            )}
-            {isLoadingBetDate ? (
-              <div>Loading Summary...</div>
-            ) : isErrorBetDate ? (
-              <div>Error fetching summary</div>
-            ) : betDateSummary && betDateSummary.length > 0 ? (
-              <div>
-                <DataTable
-                  link="/results"
-                  header="Bet Results By Date"
-                  data={betDateSummary}
-                  columns={[
-                    { label: "Date", key: "groupLabel" },
-                    { label: "Total Bets", key: "nBets" },
-                    { label: "Hits", key: "nHits" },
-                    {
-                      label: "Hit Rate",
-                      key: "hitRate",
-                      format: (value) => `${(Number(value) * 100).toFixed(1)}%`,
-                    },
-                    {
-                      label: "Profit",
-                      key: "totalProfit",
-                      format: (value) => `$${Number(value).toFixed(2)}`,
-                    },
-                  ]}
-                  rowKey={(row) => String(row.groupKey)}
-                  rowClassName={(row) =>
-                    row.groupKey.toString() === "Total" ? "font-bold" : ""
-                  }
-                />
-              </div>
-            ) : (
-              <div>Summary not found</div>
-            )}
-            {isLoadingBetP ? (
-              <div>Loading Bet Probability Chart...</div>
-            ) : isErrorBetP ? (
-              <div>Error fetching Bet Probability data</div>
-            ) : betProbBuckets && betProbBuckets.length > 0 ? (
+            </div>
+          )}
+        </AsyncSection>
+        <AsyncSection
+          isLoading={isLoadingBetP}
+          isError={isErrorBetP}
+          data={betProbBuckets}
+          loadingFallback={<div>Loading Bet Probability Chart...</div>}
+          errorFallback={<div>Error fetching Bet Probability Chart</div>}
+          emptyFallback={<div className="p-4">No Bet Probability Data Found</div>}
+        >
+          {(betProbBuckets) => (
+            <div>
               <div>
                 <AnalysisLineChart
                   metaData={betProbMetaData}
                   data={betProbBuckets}
-                  
                 />
               </div>
-            ) : (
-              <div>Bet Probability data not found</div>
-            )}
-            {isLoadingBetP ? (
-              <div>Loading Bet Probability Chart...</div>
-            ) : isErrorBetP ? (
-              <div>Error fetching Bet Probability data</div>
-            ) : betProbBuckets && betProbBuckets.length > 0 ? (
               <div>
                 <AnalysisLineChart
                   metaData={betProbProfMetaData}
                   data={betProbBuckets}
-                  
                 />
               </div>
-            ) : (
-              <div>Bet Probability data not found</div>
-            )}
-            {isLoadingOdds ? (
-              <div>Loading Odds Chart...</div>
-            ) : isErrorOdds ? (
-              <div>Error fetching Odds data</div>
-            ) : oddsBuckets && oddsBuckets.length > 0 ? (
-              <div>
-                <AnalysisLineChart
-                  metaData={oddsMetaData}
-                  data={oddsBuckets}
-                  tooltipProps={tooltip}
-                  
-                />
-              </div>
-            ) : (
-              <div>Odds data not found</div>
-            )}
-            {isLoadingEdge ? (
-              <div>Loading Edge Chart...</div>
-            ) : isErrorEdge ? (
-              <div>Error fetching Edge data</div>
-            ) : edgeBuckets && edgeBuckets.length > 0 ? (
-              <div>
-                <AnalysisLineChart
-                  metaData={edgeMetaData}
-                  data={edgeBuckets}
-                  tooltipProps={tooltip}
-                  
-                />
-              </div>
-            ) : (
-              <div>Edge data not found</div>
-            )}
+            </div>
+          )}
+        </AsyncSection>
+        <AsyncSection
+          isLoading={isLoadingOdds}
+          isError={isErrorOdds}
+          data={oddsBuckets}
+          loadingFallback={<div>Loading Bet Odds Chart...</div>}
+          errorFallback={<div>Error fetching Bet Odds Chart</div>}
+          emptyFallback={<div className="p-4">No Bet Odds Data Found</div>}
+        >
+          {(oddsBuckets) => (
+            <div>
+              <AnalysisLineChart
+                metaData={oddsMetaData}
+                data={oddsBuckets}
+                tooltipProps={tooltip}
+              />
+            </div>
+          )}
+        </AsyncSection>
+        <AsyncSection
+          isLoading={isLoadingEdge}
+          isError={isErrorEdge}
+          data={edgeBuckets}
+          loadingFallback={<div>Loading Bet Edge Chart...</div>}
+          errorFallback={<div>Error fetching Bet Edge Chart</div>}
+          emptyFallback={<div className="p-4">No Bet Edge Data Found</div>}
+        >
+          {(edgeBuckets) => (
+            <div>
+              <AnalysisLineChart
+                metaData={edgeMetaData}
+                data={edgeBuckets}
+                tooltipProps={tooltip}
+              />
+            </div>
+          )}
+        </AsyncSection>
     </div>
   )
 }

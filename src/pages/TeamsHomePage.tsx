@@ -1,6 +1,7 @@
 import { TeamCard } from "@/features/team/components/TeamCard"
 import { useBetSummary, useTeamInfo } from "@/features/queries"
 import { BetSummary } from "@/features/betting/BetSummary"
+import { AsyncSection } from "@/components/ui/AsyncSection"
 
 export function TeamsHomePage() {
   const {
@@ -26,36 +27,45 @@ export function TeamsHomePage() {
     return team ? [{ ...s, team }] : []
   })
   return (
-    <div className="mx-auto max-w-8xl p-6">
-      {isLoadingSummary ? (
-        <div>Loading Team Bet Results...</div>
-      ) : isErrorSummary ? (
-        <div>Error Loading Suggested Bets</div>
-      ) : teamBets && teamBets.length > 0 ? (
-        <div>
-          <h1 className="text-3xl font-bold mt-10">Team Bets</h1>
-          <div className="grid grid-cols-2 gap-5 mt-4 p-10 w-290">
-            {teamBets.map((teams) => (
-              <div className="flex" key={teams.groupKey}>
-                <TeamCard teamInfo={teams.team} variant={"bet"}>
-                  <BetSummary
-                    summaryHorizon="Bet Results (Playoffs)"
-                    totalBets={teams.nBets}
-                    hits={teams.nHits}
-                    hitRate={teams.hitRate}
-                    profit={teams.totalProfit}
-                  ></BetSummary>
-                </TeamCard>
-              </div>
-            ))}
+    <div className="mx-auto p-6">
+      <AsyncSection
+        isLoading={isLoadingInfo}
+        isError={isErrorInfo}
+        data={teamBets}
+        loadingFallback={<div>Loading Teams...</div>}
+        errorFallback={<div>Error fetching Teams</div>}
+        emptyFallback={<div>No Teams Found</div>}
+      >
+
+        {(teamBets) => (
+          <div>
+            <h1 className="text-3xl font-bold mt-10">Team Bets</h1>
+            <div className="grid grid-cols-2 gap-5 mt-4 p-10 w-290">
+              {teamBets.map((teams) => (
+                <div className="flex" key={teams.groupKey}>
+                  <TeamCard teamInfo={teams.team} variant={"bet"}>
+                    <AsyncSection
+                      isLoading={isLoadingSummary}
+                      isError={isErrorSummary}
+                      data={betSummaryTeam}
+                    >
+                    {(betSummaryTeam) => ( 
+                      <BetSummary
+                        summaryHorizon="Bet Summary"
+                        totalBets={betSummaryTeam[0].nBets}
+                        hits={betSummaryTeam[0].nHits}
+                        hitRate={betSummaryTeam[0].hitRate}
+                        profit={betSummaryTeam[0].totalProfit}
+                      />
+                    )}
+                    </AsyncSection>
+                  </TeamCard>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      ) : (
-        <div>
-          <h1 className="text-3xl font-bold mt-10">Bet Results By Team</h1>
-          <h3 className="text-xl font-bold mt-10">shits fucked</h3>
-        </div>
-      )}
+        )}
+      </AsyncSection>
     </div>
   )
 }
