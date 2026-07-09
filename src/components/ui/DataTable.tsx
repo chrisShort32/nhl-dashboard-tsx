@@ -35,21 +35,23 @@ export function DataTable<T>({
   const [showTable, setShowTable] = useState(true)
   return (
     <div className="mt-4">
-      <div className="flex">
-      {link ? (
-        <Link to={link}>
-          <h2 className="text-lg font-bold mb-2 hover:underline">{header}</h2>
-        </Link>
-      ) : (
-        <h2 className="text-lg font-bold mb-2">{header}</h2>
-      )}
-      <button onClick={() => setShowTable(prev => !prev)}
-              className="mb-2 hover:underline ml-4 text-xs text-[#646cff]"
-              >
-                {showTable ? "Hide" : "Show"}
-              </button>
+      <div className="flex items-center mb-2">
+        {link ? (
+          <Link to={link}>
+            <h2 className="text-lg font-bold hover:underline">{header}</h2>
+          </Link>
+        ) : (
+          <h2 className="text-lg font-bold">{header}</h2>
+        )}
+        <button
+          type="button"
+          onClick={() => setShowTable((prev) => !prev)}
+          className="hover:underline ml-4 text-xs text-accent"
+        >
+          {showTable ? "Hide" : "Show"}
+        </button>
       </div>
-      
+
       {showTable && (
         <div className="overflow-x-auto">
           <table className="table-auto">
@@ -84,7 +86,7 @@ export function DataTable<T>({
             </tbody>
           </table>
         </div>
-      )} 
+      )}
     </div>
   )
 }

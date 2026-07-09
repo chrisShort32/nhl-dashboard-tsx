@@ -48,7 +48,7 @@ export function SearchComboBox<Item>({ items, getKey, getLabel, onSelect, placeh
                     })}
             />
             {isOpen && (
-                <ul className="absolute... overscroll-y-auto overflow-auto h-30 w-50 border-2 mt-2 p-1">
+                <ul className="absolute... overscroll-y-auto overflow-auto h-30 w-50 border-1 border-blue-500 rounded-lg mt-2 p-1">
                     {filtered.map((item, index) => (
                         <li 
                             key={getKey(item)}
