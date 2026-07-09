@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom"
+import { useState } from "react"
 type Column<T> = {
   label: string
   key: string
@@ -31,8 +32,10 @@ export function DataTable<T>({
   rowClassName,
   link,
 }: TableProps<T>) {
+  const [showTable, setShowTable] = useState(true)
   return (
     <div className="mt-4">
+      <div className="flex">
       {link ? (
         <Link to={link}>
           <h2 className="text-lg font-bold mb-2 hover:underline">{header}</h2>
@@ -40,39 +43,48 @@ export function DataTable<T>({
       ) : (
         <h2 className="text-lg font-bold mb-2">{header}</h2>
       )}
-      <div className="overflow-x-auto">
-        <table className="table-auto">
-          <thead>
-            <tr>
-              {columns.map((column) => (
-                <th
-                  key={column.key}
-                  className="border border-gray-300 px-4 py-2 text-left font-semibold"
-                >
-                  {column.label}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((row) => (
-              <tr
-                key={rowKey(row)}
-                className={`hover:bg-indigo-600 ${rowClassName ? rowClassName(row) : ""}`}
+      <button onClick={() => setShowTable(prev => !prev)}
+              className="mb-2 hover:underline ml-4 text-xs text-[#646cff]"
               >
+                {showTable ? "Hide" : "Show"}
+              </button>
+      </div>
+      
+      {showTable && (
+        <div className="overflow-x-auto">
+          <table className="table-auto">
+            <thead>
+              <tr>
                 {columns.map((column) => (
-                  <td
+                  <th
                     key={column.key}
-                    className={`border border-gray-300 px-4 py-2 ${column.className || ""}`}
+                    className="border border-gray-300 px-4 py-2 text-left font-semibold"
                   >
-                    {renderCell(column, row)}
-                  </td>
+                    {column.label}
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {data.map((row) => (
+                <tr
+                  key={rowKey(row)}
+                  className={`hover:bg-indigo-600 ${rowClassName ? rowClassName(row) : ""}`}
+                >
+                  {columns.map((column) => (
+                    <td
+                      key={column.key}
+                      className={`border border-gray-300 px-4 py-2 ${column.className || ""}`}
+                    >
+                      {renderCell(column, row)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )} 
     </div>
   )
 }

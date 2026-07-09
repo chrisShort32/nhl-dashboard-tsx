@@ -243,7 +243,7 @@ export function PlayerPage() {
         data={activeResults.data}
         loadingFallback={<div>Loading Bet Results...</div>}
         errorFallback={<div>Error fetching Bet Results</div>}
-        emptyFallback={<div className="p-4">No Results Found</div>}
+        emptyFallback={<div className="p-4">No Bet Results Found</div>}
       >
         {(betResults) => (
           <div className="mt-6">
